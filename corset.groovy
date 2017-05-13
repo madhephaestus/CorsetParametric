@@ -12,3 +12,6 @@ uBreastToWaist	= new LengthParameter("under breast to waist",30,[120.0,1.0])
 waistToPubic 	= new LengthParameter("waist to pubic bone",30,[120.0,1.0])
 waistHighHip	= new LengthParameter("waist high hip",30,[120.0,1.0])
 waistLowHip	= new LengthParameter("waist low hip",30,[120.0,1.0])
+// construction
+numPanels	= new LengthParameter("number of panels",6,[12,4])
+
