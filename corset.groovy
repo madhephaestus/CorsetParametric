@@ -1,23 +1,26 @@
 import com.piro.bezier.BezierPath;
-
+CSGDatabase.clear()
+double mm(double input){
+	return input*25.4
+}
 // horizontal
-bustSize 		= new LengthParameter("Bust Size",30,[120.0,1.0])
-underbust		= new LengthParameter("underbust",30,[120.0,1.0])
-waist 		= new LengthParameter("waist",30,[120.0,1.0])
-highHip		= new LengthParameter("high hip",30,[120.0,1.0])
-lowHip 		= new LengthParameter("low hip",30,[120.0,1.0])
+//bustSize 		= new LengthParameter("Bust Size",30,[120.0,1.0])
+underbust		= new LengthParameter("underbust",mm(28),[120.0,1.0])
+waist 		= new LengthParameter("waist",mm(20),[120.0,1.0])
+highHip		= new LengthParameter("high hip",mm(30),[120.0,1.0])
+lowHip 		= new LengthParameter("low hip",mm(31),[120.0,1.0])
 // verticals
-upBreast 		= new LengthParameter("up breast",30,[120.0,1.0])
-downbreast	= new LengthParameter("down breast",30,[120.0,1.0])
-midBreast		= new LengthParameter("middle of breast",30,[120.0,1.0])
-uBreastToWaist	= new LengthParameter("under breast to waist",30,[120.0,1.0])
-waistToPubic 	= new LengthParameter("waist to pubic bone",30,[120.0,1.0])
-waistHighHip	= new LengthParameter("waist high hip",30,[120.0,1.0])
-waistLowHip	= new LengthParameter("waist low hip",30,[120.0,1.0])
-waistBackTop	= new LengthParameter("waist to top back",30,[120.0,1.0])
-waistBackBottom= new LengthParameter("waist to bottom back",30,[120.0,1.0])
+//upBreast 		= new LengthParameter("up breast",30,[120.0,1.0])
+//downbreast	= new LengthParameter("down breast",30,[120.0,1.0])
+//midBreast		= new LengthParameter("middle of breast",30,[120.0,1.0])
+uBreastToWaist	= new LengthParameter("under breast to waist",mm(5.5),[120.0,1.0])
+waistToPubic 	= new LengthParameter("waist to pubic bone",mm(7.5),[120.0,1.0])
+waistHighHip	= new LengthParameter("waist high hip",mm(4),[120.0,1.0])
+//waistLowHip	= new LengthParameter("waist low hip",30,[120.0,1.0])
+waistBackTop	= new LengthParameter("waist to top back",mm(8),[120.0,1.0])
+waistBackBottom= new LengthParameter("waist to bottom back",mm(7.5),[120.0,1.0])
 // construction
-numPanels	= new LengthParameter("number of panels",6,[12,4])
+numPanels	= new LengthParameter("number of panels",12,[12,4])
 
 public static CSG byPath(List<List<Vector3d>> points, double height) {
 
@@ -132,30 +135,51 @@ public static CSG profileWithHoles(List<List<Vector3d>> profile){
 
 	return shape
 }
+ArrayList<CSG> panels=[]
+int panelsPerSide = numPanels.getMM()/2
+double panelMaxWidth = lowHip.getMM()/numPanels.getMM()
 
-List<Vector3d> sideProfile =[ new Vector3d(0,100,0),
-			new Vector3d(0,100,0),
-			new Vector3d(90,90,0),
-			new Vector3d(100,100,0)]
-List<Vector3d> sideProfile1 =[	new Vector3d(0,0,0),
-			new Vector3d(30,30,0),
-			new Vector3d(-30,70,0),
-			new Vector3d(0,100,0)]
-List<List<Vector3d>>  profile = [
-		sideProfile1,
-		[new Vector3d(0,100,0)],
-		sideProfile,
-		[new Vector3d(100,0,0)],
-		[new Vector3d(0,0,0)]
-]
+for(int i=0;i<panelsPerSide;i++){
+	
+	cornerOne = new Vector3d(0,-waistBackBottom.getMM(),0)
+	cornerTwo = new Vector3d(0,waistBackTop.getMM(),0)
+	cornerThree = new Vector3d(panelMaxWidth,waistBackTop.getMM(),0)
+	cornerFour = new Vector3d(panelMaxWidth,-waistBackBottom.getMM(),0)
+	List<Vector3d> sideProfile =[ cornerTwo,//start point
+				new Vector3d(	cornerTwo.x,
+							cornerTwo.y,
+							0),// control one
+				new Vector3d(	cornerThree.x/2,
+							cornerThree.y/2,
+							0),// control two
+				cornerThree]// end point
+	List<Vector3d> sideProfile1 =[	cornerOne, //start point
+				new Vector3d(	cornerOne.x/2,
+							cornerOne.y/2,
+							0), // control one
+				new Vector3d(	cornerTwo.x/2,
+							cornerTwo.y/2,
+							0), // control two
+				cornerTwo] // end point
+	List<List<Vector3d>>  profile = [
+			sideProfile1,
+			[cornerTwo],
+			sideProfile,
+			[cornerFour],
+			[cornerOne]
+	]
+	
+	CSG shape = byPath(profile,02)
+	CSG hole =  new Cube(1,1,30).toCSG()
+					.movey(-3)
+	def holeParts = Extrude.move(hole,bezierToTransforms(sideProfile1,  20))
+	//holeParts.remove(holeParts.size()-1)
+	holeParts.remove(0)
+	
+	shape=shape.difference(holeParts)
+			.movex((panelMaxWidth+1)*i)
+	panels.add(shape)
+}
 
-CSG shape = byPath(profile,5)
-CSG hole =  new Cube(1,1,30).toCSG()
-				.movey(-3)
-def holeParts = Extrude.move(hole,bezierToTransforms(sideProfile1,  20))
-//holeParts.remove(holeParts.size()-1)
-holeParts.remove(0)
 
-shape=shape.difference(holeParts)
-
-return [shape]
+return panels
