@@ -143,52 +143,55 @@ double widthDifference = (panelMaxWidth-waistSecion)/2
 widthDifference=widthDifference-(widthDifference/numPanels.getMM())
 
 for(int i=0;i<panelsPerSide;i++){
+
+	double heightRight = waistHighHip.getMM()+uBreastToWaist.getMM()
+	double heightLeft = waistHighHip.getMM()+uBreastToWaist.getMM()
 	
-	double height = waistHighHip.getMM()+uBreastToWaist.getMM()
-	double controlOffset = height/4
+	double controlOffsetRight = heightRight/4
+	double controlOffsetLeft  = heightRight/4
 	List<Vector3d> rightSideUpper=[	new Vector3d(0,0,0),
-				new Vector3d(0,controlOffset,0),
-				new Vector3d(widthDifference,controlOffset,0),
-				new Vector3d(widthDifference,height/2,0)]
-	List<Vector3d> rightSideLower=[	new Vector3d(widthDifference,height/2,0),
-				new Vector3d(widthDifference,height/2+controlOffset,0),
-				new Vector3d(0,height-controlOffset,0),
-				new Vector3d(0,height,0)]
-	List<Vector3d> bottom =[ new Vector3d(0,height,0),
-				new Vector3d(10,height-10,0),
-				new Vector3d(panelMaxWidth-10,height-10,0),
-				new Vector3d(panelMaxWidth,height,0)]
-	List<Vector3d> leftSideLower =[new Vector3d(panelMaxWidth,height,0),
-				new Vector3d(panelMaxWidth,height-controlOffset,0),
-				new Vector3d(panelMaxWidth-widthDifference,height/2+controlOffset,0),
-				new Vector3d(panelMaxWidth-widthDifference,height/2,0)]
-	List<Vector3d> leftSideUpper =[new Vector3d(panelMaxWidth-widthDifference,height/2,0),
-				new Vector3d(panelMaxWidth-widthDifference,controlOffset,0),
-				new Vector3d(panelMaxWidth,controlOffset,0),
+				new Vector3d(0,controlOffsetRight,0),
+				new Vector3d(widthDifference,controlOffsetRight ,0),
+				new Vector3d(widthDifference,heightRight/2,0)]
+	List<Vector3d> rightSideLower=[	new Vector3d(widthDifference,heightRight/2,0),
+				new Vector3d(widthDifference,heightRight/2+controlOffsetRight ,0),
+				new Vector3d(0,heightRight-controlOffsetRight ,0),
+				new Vector3d(0,heightRight,0)]
+	List<Vector3d> bottom =[ new Vector3d(0,heightRight,0),
+				new Vector3d(10,heightRight-10,0),
+				new Vector3d(panelMaxWidth-10,heightLeft-10,0),
+				new Vector3d(panelMaxWidth,heightLeft,0)]
+	List<Vector3d> leftSideLower =[new Vector3d(panelMaxWidth,heightLeft,0),
+				new Vector3d(panelMaxWidth,heightLeft-controlOffsetLeft,0),
+				new Vector3d(panelMaxWidth-widthDifference,heightLeft/2+controlOffsetLeft,0),
+				new Vector3d(panelMaxWidth-widthDifference,heightLeft/2,0)]
+	List<Vector3d> leftSideUpper =[new Vector3d(panelMaxWidth-widthDifference,heightLeft/2,0),
+				new Vector3d(panelMaxWidth-widthDifference,controlOffsetLeft,0),
+				new Vector3d(panelMaxWidth,controlOffsetLeft,0),
 				new Vector3d(panelMaxWidth,0,0)]
 	List<Vector3d> top =[	new Vector3d(panelMaxWidth,0,0),
 				new Vector3d(panelMaxWidth,0,0),
 				new Vector3d(0,0,0),
 				new Vector3d(0,0,0)]	
 	if(i==(panelsPerSide-1)){
-		leftSideLower =[new Vector3d(panelMaxWidth,height,0),
-				new Vector3d(panelMaxWidth,height,0),
-				new Vector3d(panelMaxWidth,height/2,0),
-				new Vector3d(panelMaxWidth,height/2,0)]
-		leftSideUpper =[new Vector3d(panelMaxWidth,height/2,0),
-				new Vector3d(panelMaxWidth,height/2,0),
+		leftSideLower =[new Vector3d(panelMaxWidth,heightLeft,0),
+				new Vector3d(panelMaxWidth,heightLeft,0),
+				new Vector3d(panelMaxWidth,heightLeft/2,0),
+				new Vector3d(panelMaxWidth,heightLeft/2,0)]
+		leftSideUpper =[new Vector3d(panelMaxWidth,heightLeft/2,0),
+				new Vector3d(panelMaxWidth,heightLeft/2,0),
 				new Vector3d(panelMaxWidth,0,0),
 				new Vector3d(panelMaxWidth,0,0)]
 	}
 	if(i==0){
 		rightSideUpper=[	new Vector3d(0,0,0),
 				new Vector3d(0,0,0),
-				new Vector3d(0,0,0),
-				new Vector3d(0,height/2,0)]
-		rightSideLower=[	new Vector3d(0,height/2,0),
-				new Vector3d(0,height/2,0),
-				new Vector3d(0,height,0),
-				new Vector3d(0,height,0)]
+				new Vector3d(0,heightRight/2,0),
+				new Vector3d(0,heightRight/2,0)]
+		rightSideLower=[	new Vector3d(0,heightRight/2,0),
+				new Vector3d(0,heightRight/2,0),
+				new Vector3d(0,heightRight,0),
+				new Vector3d(0,heightRight,0)]
 	}
 			
 	List<List<Vector3d>>  profile = [
