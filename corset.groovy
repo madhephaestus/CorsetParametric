@@ -39,52 +39,52 @@ public static CSG byPath(List<List<Vector3d>> points, double height, int resolut
 	}
 	return Extrude.points(new Vector3d(0, 0, height), finalPath);
 }
-	public static ArrayList<Transform> pathToTransforms(List<List<Vector3d>> points, int resolution){
-		String pathStringA = "";
-		String pathStringB = "";
-		
-		ArrayList<Double> start = (ArrayList<Double>) Arrays.asList((double) 0, (double) 0, (double) 0);
-		for (List<Vector3d> sections : points) {
-			if (sections.size() == 4) {
-			Vector3d controlA= sections.get(1)
-			Vector3d controlB= sections.get(2)
-			Vector3d endPoint = sections.get(3)
-			/*
-				ArrayList<Double> controlA = (ArrayList<Double>) Arrays.asList(sections.get(1).x - start.get(0),
-						sections.get(1).y - start.get(1), sections.get(1).z - start.get(2));
-						
-				ArrayList<Double> controlB = (ArrayList<Double>) Arrays.asList(sections.get(2).x - start.get(0),
-						sections.get(2).y - start.get(1),  sections.get(2).z - start.get(2));
-				;
-				ArrayList<Double> endPoint = (ArrayList<Double>) Arrays.asList(sections.get(3).x - start.get(0),
-						sections.get(3).y - start.get(1), sections.get(3).z - start.get(2));
-				;
-				*/
-				
-				pathStringA+=("C " + controlA.x + "," + controlA.y + " " + controlB.x + ","+ controlB.y + " " + endPoint.x + "," + endPoint.y+"\n");
-				pathStringB+=("C " + controlA.x + "," + controlA.z + " " + controlB.x + ","+ controlB.z + " " + endPoint.x + "," + endPoint.z+"\n");
-				//start.set(0, sections.get(3).x);
-				//start.set(1, sections.get(3).y);
-				//start.set(2,sections.get(3).z);
-				
-			} else if (sections.size() == 1) {
-				
-				pathStringA+="L " + (double)sections.get(0).x + "," +  (double)sections.get(0).y +"\n";
-				pathStringB+="L " + (double)sections.get(0).x + "," +  (double)sections.get(0).z +"\n";
-				//start.set(0, sections.get(0).x);
-				//start.set(1, sections.get(0).y);
-				//start.set(2, sections.get(0).z);
-			}
+public static ArrayList<Transform> pathToTransforms(List<List<Vector3d>> points, int resolution){
+	String pathStringA = "";
+	String pathStringB = "";
+	
+	ArrayList<Double> start = (ArrayList<Double>) Arrays.asList((double) 0, (double) 0, (double) 0);
+	for (List<Vector3d> sections : points) {
+		if (sections.size() == 4) {
+		Vector3d controlA= sections.get(1)
+		Vector3d controlB= sections.get(2)
+		Vector3d endPoint = sections.get(3)
+		/*
+			ArrayList<Double> controlA = (ArrayList<Double>) Arrays.asList(sections.get(1).x - start.get(0),
+					sections.get(1).y - start.get(1), sections.get(1).z - start.get(2));
+					
+			ArrayList<Double> controlB = (ArrayList<Double>) Arrays.asList(sections.get(2).x - start.get(0),
+					sections.get(2).y - start.get(1),  sections.get(2).z - start.get(2));
+			;
+			ArrayList<Double> endPoint = (ArrayList<Double>) Arrays.asList(sections.get(3).x - start.get(0),
+					sections.get(3).y - start.get(1), sections.get(3).z - start.get(2));
+			;
+			*/
+			
+			pathStringA+=("C " + controlA.x + "," + controlA.y + " " + controlB.x + ","+ controlB.y + " " + endPoint.x + "," + endPoint.y+"\n");
+			pathStringB+=("C " + controlA.x + "," + controlA.z + " " + controlB.x + ","+ controlB.z + " " + endPoint.x + "," + endPoint.z+"\n");
+			//start.set(0, sections.get(3).x);
+			//start.set(1, sections.get(3).y);
+			//start.set(2,sections.get(3).z);
+			
+		} else if (sections.size() == 1) {
+			
+			pathStringA+="L " + (double)sections.get(0).x + "," +  (double)sections.get(0).y +"\n";
+			pathStringB+="L " + (double)sections.get(0).x + "," +  (double)sections.get(0).z +"\n";
+			//start.set(0, sections.get(0).x);
+			//start.set(1, sections.get(0).y);
+			//start.set(2, sections.get(0).z);
 		}
-		println "A string = " +pathStringA
-		println "B String = " +pathStringB
-		BezierPath path = new BezierPath();
-		path.parsePathString(pathStringA);
-		BezierPath path2 = new BezierPath();
-		path2.parsePathString(pathStringB);
-		
-		return Extrude.bezierToTransforms(path, path2, resolution);
 	}
+	println "A string = " +pathStringA
+	println "B String = " +pathStringB
+	BezierPath path = new BezierPath();
+	path.parsePathString(pathStringA);
+	BezierPath path2 = new BezierPath();
+	path2.parsePathString(pathStringB);
+	
+	return Extrude.bezierToTransforms(path, path2, resolution);
+}
 
 public static ArrayList<CSG> moveAlongProfile(CSG object, List<List<Vector3d>> points, int resolution){
 
@@ -138,9 +138,44 @@ public static CSG profileWithHoles(List<List<Vector3d>> profile){
 ArrayList<CSG> panels=[]
 int panelsPerSide = numPanels.getMM()/2
 double panelMaxWidth = lowHip.getMM()/numPanels.getMM()
+double waistSecion = waist.getMM()/numPanels.getMM()
+double height = waistHighHip.getMM()+uBreastToWaist.getMM()
 
 for(int i=0;i<panelsPerSide;i++){
+
+	List<Vector3d> rightSide=[	new Vector3d(0,0,0),
+				new Vector3d(30,30,0),
+				new Vector3d(-30,height-30,0),
+				new Vector3d(0,height,0)]
+	List<Vector3d> bottom =[ new Vector3d(0,height,0),
+				new Vector3d(0,height,0),
+				new Vector3d(panelMaxWidth-10,height-10,0),
+				new Vector3d(panelMaxWidth,height,0)]
+	List<Vector3d> leftSide =[new Vector3d(panelMaxWidth,height,0),
+				new Vector3d(panelMaxWidth,height,0),
+				new Vector3d(panelMaxWidth,0,0),
+				new Vector3d(panelMaxWidth,0,0)]
+	List<Vector3d> top =[	new Vector3d(panelMaxWidth,0,0),
+				new Vector3d(panelMaxWidth,0,0),
+				new Vector3d(0,0,0),
+				new Vector3d(0,0,0)]			
+	List<List<Vector3d>>  profile = [
+			rightSide,
+			bottom,
+			leftSide,
+			top
+	]
 	
+	CSG shape = byPath(profile,5)
+	CSG hole =  new Cube(1,1,30).toCSG()
+					.movey(-3)
+	def holeParts = Extrude.move(hole,bezierToTransforms(sideProfile1,  20))
+	//holeParts.remove(holeParts.size()-1)
+	holeParts.remove(0)
+	
+	shape=shape.difference(holeParts)
+			.movex((i*panelMaxWidth)+ (10*i))
+	/*
 	cornerOne = new Vector3d(0,-waistBackBottom.getMM(),0)
 	cornerTwo = new Vector3d(0,waistBackTop.getMM(),0)
 	cornerThree = new Vector3d(panelMaxWidth,waistBackTop.getMM(),0)
@@ -178,6 +213,8 @@ for(int i=0;i<panelsPerSide;i++){
 	
 	shape=shape.difference(holeParts)
 			.movex((panelMaxWidth+1)*i)
+	panels.add(shape)
+	*/
 	panels.add(shape)
 }
 
