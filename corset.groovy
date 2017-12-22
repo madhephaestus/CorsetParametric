@@ -20,7 +20,7 @@ waistHighHip	= new LengthParameter("waist high hip",mm(4),[120.0,1.0])
 waistBackTop	= new LengthParameter("waist to top back",mm(8),[120.0,1.0])
 waistBackBottom= new LengthParameter("waist to bottom back",mm(7.5),[120.0,1.0])
 // construction
-numPanels	= new LengthParameter("number of panels",12,[12,4])
+numPanels	= new LengthParameter("number of panels",8,[12,4])
 
 public static CSG byPath(List<List<Vector3d>> points, double height) {
 
@@ -139,42 +139,77 @@ ArrayList<CSG> panels=[]
 int panelsPerSide = numPanels.getMM()/2
 double panelMaxWidth = lowHip.getMM()/numPanels.getMM()
 double waistSecion = waist.getMM()/numPanels.getMM()
-double height = waistHighHip.getMM()+uBreastToWaist.getMM()
+double widthDifference = (panelMaxWidth-waistSecion)/2
+widthDifference=widthDifference-(widthDifference/numPanels.getMM())
 
 for(int i=0;i<panelsPerSide;i++){
-
-	List<Vector3d> rightSide=[	new Vector3d(0,0,0),
-				new Vector3d(30,30,0),
-				new Vector3d(-30,height-30,0),
+	
+	double height = waistHighHip.getMM()+uBreastToWaist.getMM()
+	double controlOffset = height/4
+	List<Vector3d> rightSideUpper=[	new Vector3d(0,0,0),
+				new Vector3d(0,controlOffset,0),
+				new Vector3d(widthDifference,controlOffset,0),
+				new Vector3d(widthDifference,height/2,0)]
+	List<Vector3d> rightSideLower=[	new Vector3d(widthDifference,height/2,0),
+				new Vector3d(widthDifference,height/2+controlOffset,0),
+				new Vector3d(0,height-controlOffset,0),
 				new Vector3d(0,height,0)]
 	List<Vector3d> bottom =[ new Vector3d(0,height,0),
-				new Vector3d(0,height,0),
+				new Vector3d(10,height-10,0),
 				new Vector3d(panelMaxWidth-10,height-10,0),
 				new Vector3d(panelMaxWidth,height,0)]
-	List<Vector3d> leftSide =[new Vector3d(panelMaxWidth,height,0),
-				new Vector3d(panelMaxWidth,height,0),
-				new Vector3d(panelMaxWidth,0,0),
+	List<Vector3d> leftSideLower =[new Vector3d(panelMaxWidth,height,0),
+				new Vector3d(panelMaxWidth,height-controlOffset,0),
+				new Vector3d(panelMaxWidth-widthDifference,height/2+controlOffset,0),
+				new Vector3d(panelMaxWidth-widthDifference,height/2,0)]
+	List<Vector3d> leftSideUpper =[new Vector3d(panelMaxWidth-widthDifference,height/2,0),
+				new Vector3d(panelMaxWidth-widthDifference,controlOffset,0),
+				new Vector3d(panelMaxWidth,controlOffset,0),
 				new Vector3d(panelMaxWidth,0,0)]
 	List<Vector3d> top =[	new Vector3d(panelMaxWidth,0,0),
 				new Vector3d(panelMaxWidth,0,0),
 				new Vector3d(0,0,0),
-				new Vector3d(0,0,0)]			
+				new Vector3d(0,0,0)]	
+	if(i==(panelsPerSide-1)){
+		leftSideLower =[new Vector3d(panelMaxWidth,height,0),
+				new Vector3d(panelMaxWidth,height,0),
+				new Vector3d(panelMaxWidth,height/2,0),
+				new Vector3d(panelMaxWidth,height/2,0)]
+		leftSideUpper =[new Vector3d(panelMaxWidth,height/2,0),
+				new Vector3d(panelMaxWidth,height/2,0),
+				new Vector3d(panelMaxWidth,0,0),
+				new Vector3d(panelMaxWidth,0,0)]
+	}
+	if(i==0){
+		rightSideUpper=[	new Vector3d(0,0,0),
+				new Vector3d(0,0,0),
+				new Vector3d(0,0,0),
+				new Vector3d(0,height/2,0)]
+		rightSideLower=[	new Vector3d(0,height/2,0),
+				new Vector3d(0,height/2,0),
+				new Vector3d(0,height,0),
+				new Vector3d(0,height,0)]
+	}
+			
 	List<List<Vector3d>>  profile = [
-			rightSide,
+			rightSideUpper,
+			rightSideLower,
 			bottom,
-			leftSide,
+			leftSideLower,
+			leftSideUpper,
 			top
 	]
 	
 	CSG shape = byPath(profile,5)
 	CSG hole =  new Cube(1,1,30).toCSG()
 					.movey(-3)
-	def holeParts = Extrude.move(hole,bezierToTransforms(sideProfile1,  20))
+
 	//holeParts.remove(holeParts.size()-1)
-	holeParts.remove(0)
-	
-	shape=shape.difference(holeParts)
-			.movex((i*panelMaxWidth)+ (10*i))
+	shape=shape.difference( Extrude.move(hole,bezierToTransforms(rightSideUpper,  15)))
+			 .difference( Extrude.move(hole,bezierToTransforms(rightSideLower,  15)))
+			 .difference( Extrude.move(hole,bezierToTransforms(leftSideUpper,  15)))
+			 .difference( Extrude.move(hole,bezierToTransforms(leftSideLower,  15)))
+			 .movex((i*panelMaxWidth)+ (10*i))
 	/*
 	cornerOne = new Vector3d(0,-waistBackBottom.getMM(),0)
 	cornerTwo = new Vector3d(0,waistBackTop.getMM(),0)
@@ -198,7 +233,7 @@ for(int i=0;i<panelsPerSide;i++){
 				cornerTwo] // end point
 	List<List<Vector3d>>  profile = [
 			sideProfile1,
-			[cornerTwo],
+			[cornerTwo],5
 			sideProfile,
 			[cornerFour],
 			[cornerOne]
