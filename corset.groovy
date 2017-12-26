@@ -59,10 +59,12 @@ public static CSG byPath(List<List<Vector3d>> points, double height, int resolut
 	return Extrude.points(new Vector3d(0, 0, height), finalPath);
 }
 public static ArrayList<Transform> pathToTransforms(List<List<Vector3d>> points, int resolution){
-	String pathStringA = "";
-	String pathStringB = "";
 	
-	ArrayList<Double> start = (ArrayList<Double>) Arrays.asList((double) 0, (double) 0, (double) 0);
+	
+	Vector3d start = points.get(0).get(0)
+	String pathStringA = "M "+ start.x + "," + start.y;
+	String pathStringB = pathStringA;
+	
 	for (List<Vector3d> sections : points) {
 		if (sections.size() == 4) {
 		Vector3d controlA= sections.get(1)
@@ -102,7 +104,7 @@ public static ArrayList<Transform> pathToTransforms(List<List<Vector3d>> points,
 	BezierPath path2 = new BezierPath();
 	path2.parsePathString(pathStringB);
 	
-	return Extrude.bezierToTransforms(path, path2, resolution);
+	return Extrude.bezierToTransforms(path, path2, resolution)
 }
 
 public static ArrayList<CSG> moveAlongProfile(CSG object, List<List<Vector3d>> points, int resolution){
@@ -181,36 +183,36 @@ for(int i=0;i<panelsPerSide;i++){
 	double controlOffsetRight = MaxHeightLower/4
 	double controlOffsetLeft  = MaxHeightLower/4
 
-	Vector3d upperRight = new Vector3d(0,heightRightUpper,0)
-	Vector3d centerRight = new Vector3d(widthDifference,0,0)
-	Vector3d bottomRight = new Vector3d(0,heightRightLower,0)
-	Vector3d bottomLeft  = new Vector3d(panelMaxWidth,heightLeftLower,0)
-	Vector3d centerLeft = new Vector3d(panelMaxWidth-widthDifference,0,0)
-	Vector3d upperleft = new Vector3d(panelMaxWidth,heightLeftUpper,0)
+	Vector3d upperRight = 		new Vector3d(0,heightRightUpper,0)
+	Vector3d centerRight =		new Vector3d(widthDifference,0,0)
+	Vector3d bottomRight = 		new Vector3d(0,heightRightLower,0)
+	Vector3d bottomLeft  = 		new Vector3d(panelMaxWidth,heightLeftLower,0)
+	Vector3d centerLeft = 		new Vector3d(panelMaxWidth-widthDifference,0,0)
+	Vector3d upperleft = 		new Vector3d(panelMaxWidth,heightLeftUpper,0)
 	List<Vector3d> rightSideUpper=[	upperRight,
-				new Vector3d(0,heightRightUpper+controlOffsetRight,0),
-				new Vector3d(widthDifference,-controlOffsetRight ,0),
-				centerRight]
+							new Vector3d(0,heightRightUpper+controlOffsetRight,0),
+							new Vector3d(widthDifference,-controlOffsetRight ,0),
+							centerRight]
 	List<Vector3d> rightSideLower=[	centerRight,
-				new Vector3d(widthDifference,controlOffsetRight ,0),
-				new Vector3d(0,heightRightLower-controlOffsetRight ,0),
-				bottomRight]
+							new Vector3d(widthDifference,controlOffsetRight,0),
+							new Vector3d(0,heightRightLower-controlOffsetRight ,0),
+							bottomRight]
 	List<Vector3d> bottom =[ bottomRight,
-				new Vector3d(10,heightRightLower,0),
-				new Vector3d(panelMaxWidth-10,heightLeftLower,0),
-				bottomLeft]
+							new Vector3d(10,heightRightLower,0),
+							new Vector3d(panelMaxWidth-10,heightLeftLower,0),
+							bottomLeft]
 	List<Vector3d> leftSideLower =[bottomLeft,
-				new Vector3d(panelMaxWidth,heightLeftLower-controlOffsetLeft,0),
-				new Vector3d(panelMaxWidth-widthDifference,controlOffsetLeft,0),
-				centerLeft]
+							new Vector3d(panelMaxWidth,heightLeftLower-controlOffsetLeft,0),
+							new Vector3d(panelMaxWidth-widthDifference,controlOffsetLeft,0),
+							centerLeft]
 	List<Vector3d> leftSideUpper =[centerLeft,
-				new Vector3d(panelMaxWidth-widthDifference,-controlOffsetLeft,0),
-				new Vector3d(panelMaxWidth,heightLeftUpper+controlOffsetLeft,0),
-				upperleft]
+							new Vector3d(panelMaxWidth-widthDifference,-controlOffsetLeft,0),
+							new Vector3d(panelMaxWidth,heightLeftUpper+controlOffsetLeft,0),
+							upperleft]
 	List<Vector3d> top =[	upperleft,
-				new Vector3d(panelMaxWidth-10,heightLeftUpper,0),
-				new Vector3d(10,heightRightUpper,0),
-				upperRight]	
+							new Vector3d(panelMaxWidth-10,heightLeftUpper,0),
+							new Vector3d(10,heightRightUpper,0),
+							upperRight]	
 	if(i==(panelsPerSide-1)){
 		leftSideLower =[bottomLeft,
 				bottomLeft,
@@ -233,12 +235,12 @@ for(int i=0;i<panelsPerSide;i++){
 	}
 			
 	List<List<Vector3d>>  profile = [
-			rightSideUpper,
 			rightSideLower,
 			bottom,
 			leftSideLower,
 			leftSideUpper,
-			top
+			top,
+			rightSideUpper
 	]
 	/*
 	profile = [
@@ -269,10 +271,12 @@ for(int i=0;i<panelsPerSide;i++){
 					.movez(-15)
 	}
 	//holeParts.remove(holeParts.size()-1)
+	/*
 	shape=shape.union( Extrude.move(holeR,bezierToTransforms(rightSideUpper,  15)))
 			 .union( Extrude.move(holeR,bezierToTransforms(rightSideLower,  25)))
 			 .union( Extrude.move(holeL,bezierToTransforms(leftSideUpper,  15)))
 			 .union( Extrude.move(holeL,bezierToTransforms(leftSideLower,  15)))
+	*/
 	if(i==(panelsPerSide-1))
 		shape=shape .movex((-panelMaxWidth)- (10))
 	else
