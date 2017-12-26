@@ -20,7 +20,7 @@ waistHighHip	= new LengthParameter("waist high hip",mm(4),[120.0,1.0])
 waistBackTop	= new LengthParameter("waist to top back",mm(8),[120.0,1.0])
 waistBackBottom= new LengthParameter("waist to bottom back",mm(7.5),[120.0,1.0])
 // construction
-numPanels	= new LengthParameter("number of panels",4,[12,4])
+numPanels	= new LengthParameter("number of panels",8,[12,4])
 static ArrayList<Line3D> showEdges(ArrayList<Vector3d> finalPath,Double offset, javafx.scene.paint.Color color ){
 	 ArrayList<Line3D> lines =[]
 	for(int i=0;i<finalPath.size();i++){
@@ -198,8 +198,8 @@ for(int i=0;i<panelsPerSide;i++){
 							new Vector3d(0,heightRightLower-controlOffsetRight ,0),
 							bottomRight]
 	List<Vector3d> bottom =[ bottomRight,
-							new Vector3d(10,heightRightLower,0),
-							new Vector3d(panelMaxWidth-10,heightLeftLower,0),
+							new Vector3d(widthDifference,heightRightLower,0),
+							new Vector3d(panelMaxWidth-widthDifference,heightLeftLower,0),
 							bottomLeft]
 	List<Vector3d> leftSideLower =[bottomLeft,
 							new Vector3d(panelMaxWidth,heightLeftLower-controlOffsetLeft,0),
@@ -210,8 +210,8 @@ for(int i=0;i<panelsPerSide;i++){
 							new Vector3d(panelMaxWidth,heightLeftUpper+controlOffsetLeft,0),
 							upperleft]
 	List<Vector3d> top =[	upperleft,
-							new Vector3d(panelMaxWidth-10,heightLeftUpper,0),
-							new Vector3d(10,heightRightUpper,0),
+							new Vector3d(panelMaxWidth-widthDifference,heightLeftUpper,0),
+							new Vector3d(widthDifference,heightRightUpper,0),
 							upperRight]	
 	if(i==(panelsPerSide-1)){
 		leftSideLower =[bottomLeft,
@@ -261,22 +261,22 @@ for(int i=0;i<panelsPerSide;i++){
 	CSG holeL =  new Cube(1,1,30).toCSG()
 					.movey(-3)
 	if(i==0){
-		holeR =  new Cylinder(2,30).toCSG()
+		holeR =  new Cylinder(2,30,(int)10).toCSG()
 					.movey(-5)					
 					.movez(-15)
 	}
 	if(i==(panelsPerSide-1)){
-		holeL =  new Cylinder(2,30).toCSG()
+		holeL =  new Cylinder(2,30,(int)10).toCSG()
 					.movey(-5)
 					.movez(-15)
 	}
 	//holeParts.remove(holeParts.size()-1)
-	/*
-	shape=shape.union( Extrude.move(holeR,bezierToTransforms(rightSideUpper,  15)))
-			 .union( Extrude.move(holeR,bezierToTransforms(rightSideLower,  25)))
-			 .union( Extrude.move(holeL,bezierToTransforms(leftSideUpper,  15)))
-			 .union( Extrude.move(holeL,bezierToTransforms(leftSideLower,  15)))
-	*/
+	
+	shape=shape.difference( Extrude.move(holeR,bezierToTransforms(rightSideUpper,  10)))
+			 .difference( Extrude.move(holeR,bezierToTransforms(rightSideLower,  10)))
+			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideUpper,  10)))
+			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideLower,  10)))
+	
 	if(i==(panelsPerSide-1))
 		shape=shape .movex((-panelMaxWidth)- (10))
 	else
