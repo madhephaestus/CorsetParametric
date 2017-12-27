@@ -143,7 +143,7 @@ public static ArrayList<Transform> bezierToTransforms(Vector3d start, Vector3d c
 			"C " + controlA.x + "," + controlA.z + " " + controlB.x + "," + controlB.z + " "
 			+ endPoint.x + "," + endPoint.z);
 
-	def parts =  Extrude.bezierToTransforms(path, path2, iterations);
+	def parts =  Extrude.bezierToTransforms(path, path2, iterations+2);
 	parts.remove(parts.size()-1)
 	parts.remove(0)
 	return parts
