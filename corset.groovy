@@ -143,7 +143,10 @@ public static ArrayList<Transform> bezierToTransforms(Vector3d start, Vector3d c
 			"C " + controlA.x + "," + controlA.z + " " + controlB.x + "," + controlB.z + " "
 			+ endPoint.x + "," + endPoint.z);
 
-	return Extrude.bezierToTransforms(path, path2, iterations);
+	def parts =  Extrude.bezierToTransforms(path, path2, iterations);
+	parts.remove(parts.size()-1)
+	parts.remove(0)
+	return parts
 }
 
 public static CSG profileWithHoles(List<List<Vector3d>> profile){
@@ -256,9 +259,9 @@ for(int i=0;i<panelsPerSide;i++){
 	println profile
 	CSG shape = byPath(profile,5)
 	//CSG shape = new Cube(1).toCSG()
-	CSG holeR =  new Cube(1,1,30).toCSG()
+	CSG holeR =  new Cube(2,2,30).toCSG()
 					.movey(-3)
-	CSG holeL =  new Cube(1,1,30).toCSG()
+	CSG holeL =  new Cube(2,2,30).toCSG()
 					.movey(-3)
 	if(i==0){
 		holeR =  new Cylinder(2,30,(int)10).toCSG()
@@ -270,6 +273,7 @@ for(int i=0;i<panelsPerSide;i++){
 					.movey(-5)
 					.movez(-15)
 	}
+	
 	//holeParts.remove(holeParts.size()-1)
 	
 	shape=shape.difference( Extrude.move(holeR,bezierToTransforms(rightSideUpper,  10)))
@@ -277,10 +281,10 @@ for(int i=0;i<panelsPerSide;i++){
 			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideUpper,  10)))
 			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideLower,  10)))
 	
-	if(i==(panelsPerSide-1))
-		shape=shape .movex((-panelMaxWidth)- (10))
-	else
-		shape=shape.movex((i*panelMaxWidth)+ (20*i))
+	//if(i==(panelsPerSide-1))
+	//	shape=shape .movex((-panelMaxWidth)- (10))
+	//else
+		shape=shape.movex((i*panelMaxWidth)+ (10*i))
 	/*
 	cornerOne = new Vector3d(0,-waistBackBottom.getMM(),0)
 	cornerTwo = new Vector3d(0,waistBackTop.getMM(),0)
@@ -321,6 +325,7 @@ for(int i=0;i<panelsPerSide;i++){
 			.movex((panelMaxWidth+1)*i)
 	panels.add(shape)
 	*/
+	shape.addExportFormat("svg")
 	panels.add(shape)
 }
 
