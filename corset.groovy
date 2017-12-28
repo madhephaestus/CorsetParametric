@@ -3,6 +3,7 @@ CSGDatabase.clear()
 double mm(double input){
 	return input*25.4
 }
+double seamInset = 6
 // horizontal
 //bustSize 		= new LengthParameter("Bust Size",30,[120.0,1.0])
 underbust		= new LengthParameter("underbust",mm(28),[120.0,1.0])
@@ -165,9 +166,9 @@ int panelsPerSide = numPanels.getMM()/2
 
 
 for(int i=0;i<panelsPerSide;i++){
-	
-	double panelMaxWidth = lowHip.getMM()/numPanels.getMM()
-	double waistSecion = waist.getMM()/numPanels.getMM()
+	double seamAllowance = (seamInset*(panelsPerSide-1))/panelsPerSide
+	double panelMaxWidth = lowHip.getMM()/numPanels.getMM()+seamAllowance
+	double waistSecion = waist.getMM()/numPanels.getMM()+seamAllowance
 	double widthDifference = (panelMaxWidth-waistSecion)/2
 	widthDifference=widthDifference+(widthDifference/numPanels.getMM())
 	double MinHeightUpper = uBreastToWaist.getMM()
@@ -177,7 +178,6 @@ for(int i=0;i<panelsPerSide;i++){
 
 	double incrementA = Math.sin(Math.PI*(i)/panelsPerSide)
 	double incrementB = Math.sin(Math.PI*(i+1)/panelsPerSide)
-	
 	if(i>=(panelsPerSide/2)){
 		 MinHeightUpper = uBreastToWaist.getMM()
 		 MaxHeightUpper =uBreastToWaist.getMM()
@@ -261,9 +261,9 @@ for(int i=0;i<panelsPerSide;i++){
 	//println profile
 	CSG shape = byPath(profile,5)
 	CSG holeR =  new Cube(2,2,30).toCSG()
-					.movey(-3)
+					.movey(-seamInset/2)
 	CSG holeL =  new Cube(2,2,30).toCSG()
-					.movey(-3)
+					.movey(-seamInset/2)
 	if(i==0){
 		holeR =  new Cylinder(2,30,(int)10).toCSG()
 					.movey(-5)					
