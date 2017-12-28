@@ -18,7 +18,7 @@ waistToPubic 	= new LengthParameter("waist to pubic bone",mm(7.5),[120.0,1.0])
 waistHighHip	= new LengthParameter("waist high hip",mm(4),[120.0,1.0])
 //waistLowHip	= new LengthParameter("waist low hip",30,[120.0,1.0])
 waistBackTop	= new LengthParameter("waist to top back",mm(8),[120.0,1.0])
-waistBackBottom= new LengthParameter("waist to bottom back",mm(7.5),[120.0,1.0])
+waistBackBottom= new LengthParameter("waist to bottom back",mm(9.5),[120.0,1.0])
 // construction
 numPanels	= new LengthParameter("number of panels",8,[12,4])
 static ArrayList<Line3D> showEdges(ArrayList<Vector3d> finalPath,Double offset, javafx.scene.paint.Color color ){
@@ -162,18 +162,30 @@ public static CSG profileWithHoles(List<List<Vector3d>> profile){
 
 ArrayList<CSG> panels=[]
 int panelsPerSide = numPanels.getMM()/2
-double panelMaxWidth = lowHip.getMM()/numPanels.getMM()
-double waistSecion = waist.getMM()/numPanels.getMM()
-double widthDifference = (panelMaxWidth-waistSecion)/2
-widthDifference=widthDifference+(widthDifference/numPanels.getMM())
-double MinHeightUpper = uBreastToWaist.getMM()
-double MaxHeightUpper =waistBackTop.getMM()
-double MinHeightLower = waistHighHip.getMM()
-double MaxHeightLower =waistBackBottom.getMM()
+
 
 for(int i=0;i<panelsPerSide;i++){
+	
+	double panelMaxWidth = lowHip.getMM()/numPanels.getMM()
+	double waistSecion = waist.getMM()/numPanels.getMM()
+	double widthDifference = (panelMaxWidth-waistSecion)/2
+	widthDifference=widthDifference+(widthDifference/numPanels.getMM())
+	double MinHeightUpper = uBreastToWaist.getMM()
+	double MaxHeightUpper =waistBackTop.getMM()
+	double MinHeightLower = waistHighHip.getMM()
+	double MaxHeightLower =waistBackBottom.getMM()
+
 	double incrementA = Math.sin(Math.PI*(i)/panelsPerSide)
 	double incrementB = Math.sin(Math.PI*(i+1)/panelsPerSide)
+	
+	if(i>=(panelsPerSide/2)){
+		 MinHeightUpper = uBreastToWaist.getMM()
+		 MaxHeightUpper =uBreastToWaist.getMM()
+		 MinHeightLower = waistHighHip.getMM()
+		 MaxHeightLower =waistToPubic.getMM()
+		 
+	}
+	
 	println "Increment A = "+incrementA+" increment b "+incrementB
 	double heightDifferenceUpper =MaxHeightUpper- MinHeightUpper
 	double heightDifferenceLower =MaxHeightLower- MinHeightLower
@@ -216,7 +228,8 @@ for(int i=0;i<panelsPerSide;i++){
 							new Vector3d(panelMaxWidth-widthDifference,heightLeftUpper,0),
 							new Vector3d(widthDifference,heightRightUpper,0),
 							upperRight]	
-	if(i==(panelsPerSide-1)){
+	if(i==(panelsPerSide-1)||
+	   i==numPanels.getMM()-1){
 		leftSideLower =[bottomLeft,
 				bottomLeft,
 				new Vector3d(panelMaxWidth,0,0),
@@ -226,7 +239,7 @@ for(int i=0;i<panelsPerSide;i++){
 				upperleft,
 				upperleft]
 	}
-	if(i==0){
+	if(i==(panelsPerSide)||i==0){
 		rightSideUpper=[	upperRight,
 				upperRight,
 				new Vector3d(0,0,0),
@@ -245,20 +258,8 @@ for(int i=0;i<panelsPerSide;i++){
 			top,
 			rightSideUpper
 	]
-	/*
-	profile = [
-			[upperRight],
-			[centerRight],
-			[bottomRight],
-			[bottomLeft],
-			[centerLeft],
-			[upperleft],
-			[upperRight]
-	]
-	*/
-	println profile
+	//println profile
 	CSG shape = byPath(profile,5)
-	//CSG shape = new Cube(1).toCSG()
 	CSG holeR =  new Cube(2,2,30).toCSG()
 					.movey(-3)
 	CSG holeL =  new Cube(2,2,30).toCSG()
@@ -285,46 +286,6 @@ for(int i=0;i<panelsPerSide;i++){
 	//	shape=shape .movex((-panelMaxWidth)- (10))
 	//else
 		shape=shape.movex((i*panelMaxWidth)+ (10*i))
-	/*
-	cornerOne = new Vector3d(0,-waistBackBottom.getMM(),0)
-	cornerTwo = new Vector3d(0,waistBackTop.getMM(),0)
-	cornerThree = new Vector3d(panelMaxWidth,waistBackTop.getMM(),0)
-	cornerFour = new Vector3d(panelMaxWidth,-waistBackBottom.getMM(),0)
-	List<Vector3d> sideProfile =[ cornerTwo,//start point
-				new Vector3d(	cornerTwo.x,
-							cornerTwo.y,
-							0),// control one
-				new Vector3d(	cornerThree.x/2,
-							cornerThree.y/2,
-							0),// control two
-				cornerThree]// end point
-	List<Vector3d> sideProfile1 =[	cornerOne, //start point
-				new Vector3d(	cornerOne.x/2,
-							cornerOne.y/2,
-							0), // control one
-				new Vector3d(	cornerTwo.x/2,
-							cornerTwo.y/2,
-							0), // control two
-				cornerTwo] // end point
-	List<List<Vector3d>>  profile = [
-			sideProfile1,
-			[cornerTwo],5
-			sideProfile,
-			[cornerFour],
-			[cornerOne]
-	]
-	
-	CSG shape = byPath(profile,02)
-	CSG hole =  new Cube(1,1,30).toCSG()
-					.movey(-3)
-	def holeParts = Extrude.move(hole,bezierToTransforms(sideProfile1,  20))
-	//holeParts.remove(holeParts.size()-1)
-	holeParts.remove(0)
-	
-	shape=shape.difference(holeParts)
-			.movex((panelMaxWidth+1)*i)
-	panels.add(shape)
-	*/
 	shape.addExportFormat("svg")
 	panels.add(shape)
 }
