@@ -223,13 +223,13 @@ for(int i=0;i<panelsPerSide;i++){
 	if(i==(panelsPerSide-1)||
 	   i==numPanels.getMM()-1){
 		leftSideLower =[new Vector3d(panelMaxWidth,heightLeftLower,0),
-				new Vector3d(panelMaxWidth,heightLeftLower,0),
-				new Vector3d(panelMaxWidth-(upperDiff/2),0,0),
+				new Vector3d(panelMaxWidth-(upperDiff/8),heightLeftLower*3/4,0),
+				new Vector3d(panelMaxWidth-(upperDiff/4),heightLeftLower/4,0),
 				new Vector3d(panelMaxWidth-(upperDiff/2),0,0)]
-		leftSideUpper =[new Vector3d(panelMaxWidth-(upperDiff/2),0,0),			
-				new Vector3d(panelMaxWidth-(upperDiff/2),heightLeftUpper/4,0),
-				new Vector3d(upperWidth,heightRightUpper*3/4,0),
-				new Vector3d(upperWidth,heightLeftUpper,0)]
+		leftSideUpper =[	new Vector3d(panelMaxWidth-(upperDiff/2),0,0),			
+						new Vector3d(panelMaxWidth-(upperDiff/1.5),heightLeftUpper/4,0),
+						new Vector3d(panelMaxWidth-(upperDiff/1.25),heightRightUpper*3/4,0),
+						new Vector3d(panelMaxWidth-(upperDiff/1),heightLeftUpper,0)]
 	}
 	if(i==(panelsPerSide)||i==0){
 		rightSideUpper=[	new Vector3d(upperDiff,heightRightUpper,0),
@@ -264,17 +264,16 @@ for(int i=0;i<panelsPerSide;i++){
 					.movez(-15)
 	}
 	if(i==(panelsPerSide-1)){
-		holeL =  new Cylinder(2,30,(int)10).toCSG()
-					.movey(-5)
-					.movez(-15)
+		holeL =  holeR.movex(mm(-0.5)).union(holeR.movex(mm(-1)))
+					
 	}
 	
 	//holeParts.remove(holeParts.size()-1)
 	
 	shape=shape.difference( Extrude.move(holeR,bezierToTransforms(rightSideUpper,  9)))
 			 .difference( Extrude.move(holeR,bezierToTransforms(rightSideLower,  9)))
-			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideUpper,  9)))
-			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideLower,  9)))
+			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideUpper, i==(panelsPerSide-1)?3: 9)))
+			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideLower, i==(panelsPerSide-1)?4: 9)))
 	
 	//if(i==(panelsPerSide-1))
 	//	shape=shape .movex((-panelMaxWidth)- (10))
