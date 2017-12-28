@@ -233,12 +233,12 @@ for(int i=0;i<panelsPerSide;i++){
 	}
 	if(i==(panelsPerSide)||i==0){
 		rightSideUpper=[	new Vector3d(upperDiff,heightRightUpper,0),
-				new Vector3d(upperDiff,heightRightUpper,0),
-				new Vector3d(upperDiff/2,0,0),
+				new Vector3d(upperDiff/1.25,heightRightUpper*3/4,0),
+				new Vector3d(upperDiff/1.5,heightRightUpper/4,0),
 				new Vector3d(upperDiff/2,0,0)]
 		rightSideLower=[	new Vector3d(upperDiff/2,0,0),
-				new Vector3d(upperDiff/2,0,0),
-				new Vector3d(0,heightRightLower,0),
+				new Vector3d(upperDiff/4,heightRightLower/4,0),
+				new Vector3d(upperDiff/8,heightRightLower*3/4,0),
 				new Vector3d(0,heightRightLower,0)]
 	}
 			
