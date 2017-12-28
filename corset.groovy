@@ -187,15 +187,17 @@ for(int i=0;i<panelsPerSide;i++){
 	
 	double controlOffsetRight = MaxHeightLower/4
 	double controlOffsetLeft  = MaxHeightLower/4
+	double upperWidth = underbust.getMM()/numPanels.getMM()
+	double upperDiff = panelMaxWidth-upperWidth
 
-	Vector3d upperRight = 		new Vector3d(0,heightRightUpper,0)
+	Vector3d upperRight = 		new Vector3d(upperDiff,heightRightUpper,0)
 	Vector3d centerRight =		new Vector3d(widthDifference,0,0)
 	Vector3d bottomRight = 		new Vector3d(0,heightRightLower,0)
 	Vector3d bottomLeft  = 		new Vector3d(panelMaxWidth,heightLeftLower,0)
 	Vector3d centerLeft = 		new Vector3d(panelMaxWidth-widthDifference,0,0)
-	Vector3d upperleft = 		new Vector3d(panelMaxWidth,heightLeftUpper,0)
+	Vector3d upperleft = 		new Vector3d(upperWidth,heightLeftUpper,0)
 	List<Vector3d> rightSideUpper=[	upperRight,
-							new Vector3d(0,heightRightUpper+controlOffsetRight,0),
+							new Vector3d(upperDiff,heightRightUpper+controlOffsetRight,0),
 							new Vector3d(widthDifference,-controlOffsetRight ,0),
 							centerRight]
 	List<Vector3d> rightSideLower=[	centerRight,
@@ -212,7 +214,7 @@ for(int i=0;i<panelsPerSide;i++){
 							centerLeft]
 	List<Vector3d> leftSideUpper =[centerLeft,
 							new Vector3d(panelMaxWidth-widthDifference,-controlOffsetLeft,0),
-							new Vector3d(panelMaxWidth,heightLeftUpper+controlOffsetLeft,0),
+							new Vector3d(upperWidth,heightLeftUpper+controlOffsetLeft,0),
 							upperleft]
 	List<Vector3d> top =[	upperleft,
 							new Vector3d(panelMaxWidth-widthDifference,heightLeftUpper,0),
@@ -220,25 +222,24 @@ for(int i=0;i<panelsPerSide;i++){
 							upperRight]	
 	if(i==(panelsPerSide-1)||
 	   i==numPanels.getMM()-1){
-		leftSideLower =[bottomLeft,
-				new Vector3d(panelMaxWidth,heightLeftLower*3/4,0),
-				new Vector3d(panelMaxWidth,heightLeftLower/4,0),,
-				new Vector3d(panelMaxWidth,0,0)]
-		leftSideUpper =[new Vector3d(panelMaxWidth,0,0),
-				
-				new Vector3d(panelMaxWidth,heightLeftUpper/4,0),
-				new Vector3d(panelMaxWidth,heightRightUpper*3/4,0),
-				upperleft]
+		leftSideLower =[new Vector3d(panelMaxWidth,heightLeftLower,0),
+				new Vector3d(panelMaxWidth,heightLeftLower,0),
+				new Vector3d(panelMaxWidth-(upperDiff/2),0,0),
+				new Vector3d(panelMaxWidth-(upperDiff/2),0,0)]
+		leftSideUpper =[new Vector3d(panelMaxWidth-(upperDiff/2),0,0),			
+				new Vector3d(panelMaxWidth-(upperDiff/2),heightLeftUpper/4,0),
+				new Vector3d(upperWidth,heightRightUpper*3/4,0),
+				new Vector3d(upperWidth,heightLeftUpper,0)]
 	}
 	if(i==(panelsPerSide)||i==0){
-		rightSideUpper=[	upperRight,
-				new Vector3d(0,heightRightUpper*3/4,0),
-				new Vector3d(0,heightRightUpper/4,0),
-				new Vector3d(0,0,0)]
-		rightSideLower=[	new Vector3d(0,0,0),
-				new Vector3d(0,heightRightLower/4,0),
-				new Vector3d(0,heightRightLower*3/4,0),
-				bottomRight]
+		rightSideUpper=[	new Vector3d(upperDiff,heightRightUpper,0),
+				new Vector3d(upperDiff,heightRightUpper,0),
+				new Vector3d(upperDiff/2,0,0),
+				new Vector3d(upperDiff/2,0,0)]
+		rightSideLower=[	new Vector3d(upperDiff/2,0,0),
+				new Vector3d(upperDiff/2,0,0),
+				new Vector3d(0,heightRightLower,0),
+				new Vector3d(0,heightRightLower,0)]
 	}
 			
 	List<List<Vector3d>>  profile = [
