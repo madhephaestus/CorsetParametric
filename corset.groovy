@@ -144,22 +144,12 @@ public static ArrayList<Transform> bezierToTransforms(Vector3d start, Vector3d c
 			"C " + controlA.x + "," + controlA.z + " " + controlB.x + "," + controlB.z + " "
 			+ endPoint.x + "," + endPoint.z);
 
-	def parts =  Extrude.bezierToTransforms(path, path2, iterations+2);
-	parts.remove(parts.size()-1)
+	def parts =  Extrude.bezierToTransforms(path, path2, iterations+1);
+	//parts.remove(parts.size()-1)
 	parts.remove(0)
 	return parts
 }
 
-public static CSG profileWithHoles(List<List<Vector3d>> profile){
-	CSG hole =  new Cube(1,1,30).toCSG()
-				.movey(-3)
-	
-	def holes = 	CSG.unionAll(	moveAlongProfile(hole,profile,40)		)
-	CSG shape= byPath(profile,5)
-			.difference(holes)
-
-	return shape
-}
 
 ArrayList<CSG> panels=[]
 int panelsPerSide = numPanels.getMM()/2
@@ -231,22 +221,23 @@ for(int i=0;i<panelsPerSide;i++){
 	if(i==(panelsPerSide-1)||
 	   i==numPanels.getMM()-1){
 		leftSideLower =[bottomLeft,
-				bottomLeft,
-				new Vector3d(panelMaxWidth,0,0),
+				new Vector3d(panelMaxWidth,heightLeftLower*3/4,0),
+				new Vector3d(panelMaxWidth,heightLeftLower/4,0),,
 				new Vector3d(panelMaxWidth,0,0)]
 		leftSideUpper =[new Vector3d(panelMaxWidth,0,0),
-				new Vector3d(panelMaxWidth,0,0),
-				upperleft,
+				
+				new Vector3d(panelMaxWidth,heightLeftUpper/4,0),
+				new Vector3d(panelMaxWidth,heightRightUpper*3/4,0),
 				upperleft]
 	}
 	if(i==(panelsPerSide)||i==0){
 		rightSideUpper=[	upperRight,
-				upperRight,
-				new Vector3d(0,0,0),
+				new Vector3d(0,heightRightUpper*3/4,0),
+				new Vector3d(0,heightRightUpper/4,0),
 				new Vector3d(0,0,0)]
 		rightSideLower=[	new Vector3d(0,0,0),
-				new Vector3d(0,0,0),
-				bottomRight,
+				new Vector3d(0,heightRightLower/4,0),
+				new Vector3d(0,heightRightLower*3/4,0),
 				bottomRight]
 	}
 			
@@ -262,8 +253,10 @@ for(int i=0;i<panelsPerSide;i++){
 	CSG shape = byPath(profile,5)
 	CSG holeR =  new Cube(2,2,30).toCSG()
 					.movey(-seamInset/2)
+					
 	CSG holeL =  new Cube(2,2,30).toCSG()
 					.movey(-seamInset/2)
+					
 	if(i==0){
 		holeR =  new Cylinder(2,30,(int)10).toCSG()
 					.movey(-5)					
@@ -277,10 +270,10 @@ for(int i=0;i<panelsPerSide;i++){
 	
 	//holeParts.remove(holeParts.size()-1)
 	
-	shape=shape.difference( Extrude.move(holeR,bezierToTransforms(rightSideUpper,  10)))
-			 .difference( Extrude.move(holeR,bezierToTransforms(rightSideLower,  10)))
-			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideUpper,  10)))
-			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideLower,  10)))
+	shape=shape.difference( Extrude.move(holeR,bezierToTransforms(rightSideUpper,  9)))
+			 .difference( Extrude.move(holeR,bezierToTransforms(rightSideLower,  9)))
+			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideUpper,  9)))
+			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideLower,  9)))
 	
 	//if(i==(panelsPerSide-1))
 	//	shape=shape .movex((-panelMaxWidth)- (10))
