@@ -21,7 +21,7 @@ waistHighHip	= new LengthParameter("waist high hip",mm(4),[120.0,1.0])
 waistBackTop	= new LengthParameter("waist to top back",mm(8),[120.0,1.0])
 waistBackBottom= new LengthParameter("waist to bottom back",mm(9.5),[120.0,1.0])
 // construction
-numPanels	= new LengthParameter("number of panels",8,[12,4])
+numPanels	= new LengthParameter("number of panels",4,[12,4])
 static ArrayList<Line3D> showEdges(ArrayList<Vector3d> finalPath,Double offset, javafx.scene.paint.Color color ){
 	 ArrayList<Line3D> lines =[]
 	for(int i=0;i<finalPath.size();i++){
@@ -133,10 +133,80 @@ public static ArrayList<Transform> bezierToTransforms(List<Vector3d> parts, int 
 		return bezierToTransforms(new Vector3d(0, 0,0) , new Vector3d(0, 0,0), parts.get(0),parts.get(0), iterations);
 	return bezierToTransforms(parts.get(0), parts.get(1), parts.get(2),parts.get(3), iterations);
 }
+public static ArrayList<Transform> bezierToTransforms(BezierPath pathA, BezierPath pathB, int iterations) {
+	ArrayList<Transform> p = new ArrayList<Transform>();
+	Vector3d pointAStart = pathA.eval(0);
+	Vector3d pointBStart = pathB.eval(0);
+	double x = pointAStart.x, y = pointAStart.y, z =  pointBStart.y;
+	double lastx = x, lasty = y, lastz = z;
+	
+	for (int i = 0; i < iterations - 1; i++) {
+		float pathFunction = (float)(i/(iterations - 1))+0.00001
+		Vector3d pointA = pathA.eval(pathFunction);
+		Vector3d pointB = pathB.eval(pathFunction);
+
+		x = pointA.x;
+		y = pointA.y;
+		z = pointB.y;
+		
+		Transform t = new Transform();
+		t.translateX(x);
+		t.translateY(y);
+		t.translateZ(z);
+
+		double ydiff = y - lasty;
+		double zdiff = z - lastz;
+		double xdiff = x - lastx;
+
+		// t.rotX(45-Math.toDegrees(Math.atan2(zdiff,ydiff)))
+
+		double rise = zdiff;
+		double run = Math.sqrt((ydiff * ydiff) + (xdiff * xdiff));
+		double rotz = 90 - Math.toDegrees(Math.atan2(xdiff, ydiff));
+		double roty = Math.toDegrees(Math.atan2(rise, run));
+
+		t.rotZ(-rotz);
+		t.rotY(roty);
+		if(i==0)
+			println "  Tr = "+x+" "+y+" "+z
+		// println "z = "+rotz+" y = "+roty
+		p.add(t);
+		lastx = x;
+		lasty = y;
+		lastz = z;
+	}
+	Vector3d pointA = pathA.eval((float) 0.99999);
+	Vector3d pointB = pathB.eval((float) 0.99999);
+
+	x = pointA.x;
+	y = pointA.y;
+	z = pointB.y;
+	Transform t = new Transform();
+	t.translateX(x);
+	t.translateY(y);
+	t.translateZ(z);
+
+	double ydiff = y - lasty;
+	double zdiff = z - lastz;
+	double xdiff = x - lastx;
+
+	double rise = zdiff;
+	double run = Math.sqrt((ydiff * ydiff) + (xdiff * xdiff));
+	double rotz = 90 - Math.toDegrees(Math.atan2(xdiff, ydiff));
+	double roty = Math.toDegrees(Math.atan2(rise, run));
+
+	t.rotZ(-rotz);
+	t.rotY(roty);
+	p.add(t);
+
+	return p;
+}
 public static ArrayList<Transform> bezierToTransforms(Vector3d start, Vector3d controlA, Vector3d controlB,
 		Vector3d endPoint, int iterations) {
+	String startString = "M "+start.x+","+start.y
+	println "Start = "+startString
 	BezierPath path = new BezierPath();
-	path.parsePathString("M "+start.x+","+start.y+"\n"+
+	path.parsePathString(startString+"\n"+
 			"C " + controlA.x + "," + controlA.y + " " + controlB.x + "," + controlB.y + " "
 			+ endPoint.x + "," + endPoint.y);
 	BezierPath path2 = new BezierPath();
@@ -144,10 +214,14 @@ public static ArrayList<Transform> bezierToTransforms(Vector3d start, Vector3d c
 			"C " + controlA.x + "," + controlA.z + " " + controlB.x + "," + controlB.z + " "
 			+ endPoint.x + "," + endPoint.z);
 
-	def parts =  Extrude.bezierToTransforms(path, path2, iterations+1);
-	//parts.remove(parts.size()-1)
-	parts.remove(0)
-	return parts
+	def parts =  bezierToTransforms(path, path2, iterations);
+	def newParts =[]
+	for(int i=0;iterations!=newParts.size();i++){
+		newParts.add(parts.get(i))
+	}
+	//newParts.remove(parts.size()-1)
+	//newParts.remove(0)
+	return newParts
 }
 
 
@@ -254,9 +328,11 @@ for(int i=0;i<panelsPerSide;i++){
 	CSG shape = byPath(profile,5)
 	CSG holeR =  new Cube(2,2,30).toCSG()
 					.movey(-seamInset/2)
+					//.movex(mm(-0.5))
 					
 	CSG holeL =  new Cube(2,2,30).toCSG()
 					.movey(-seamInset/2)
+					//.movex(mm(-0.2))
 					
 	if(i==0){
 		holeR =  new Cylinder(2,30,(int)10).toCSG()
@@ -270,9 +346,9 @@ for(int i=0;i<panelsPerSide;i++){
 	
 	//holeParts.remove(holeParts.size()-1)
 	
-	shape=shape.difference( Extrude.move(holeR,bezierToTransforms(rightSideUpper,  9)))
+	shape=shape.union( Extrude.move(holeR,bezierToTransforms(rightSideUpper,  6)))
 			 .difference( Extrude.move(holeR,bezierToTransforms(rightSideLower,  9)))
-			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideUpper, i==(panelsPerSide-1)?3: 9)))
+			 .union( Extrude.move(holeL,bezierToTransforms(leftSideUpper, i==(panelsPerSide-1)?3: 6)))
 			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideLower, i==(panelsPerSide-1)?4: 9)))
 	
 	//if(i==(panelsPerSide-1))
