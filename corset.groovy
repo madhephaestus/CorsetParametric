@@ -328,11 +328,11 @@ for(int i=0;i<panelsPerSide;i++){
 	CSG shape = byPath(profile,5)
 	CSG holeR =  new Cube(2,2,30).toCSG()
 					.movey(-seamInset/2)
-					//.movex(mm(-0.5))
+					.movex(mm(0.2))
 					
 	CSG holeL =  new Cube(2,2,30).toCSG()
 					.movey(-seamInset/2)
-					//.movex(mm(-0.2))
+					.movex(mm(-0.2))
 					
 	if(i==0){
 		holeR =  new Cylinder(2,30,(int)10).toCSG()
@@ -346,10 +346,10 @@ for(int i=0;i<panelsPerSide;i++){
 	
 	//holeParts.remove(holeParts.size()-1)
 	
-	shape=shape.union( Extrude.move(holeR,bezierToTransforms(rightSideUpper,  6)))
-			 .difference( Extrude.move(holeR,bezierToTransforms(rightSideLower,  9)))
-			 .union( Extrude.move(holeL,bezierToTransforms(leftSideUpper, i==(panelsPerSide-1)?3: 6)))
-			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideLower, i==(panelsPerSide-1)?4: 9)))
+	shape=shape.difference( Extrude.move(holeR,bezierToTransforms(rightSideUpper,  10)))
+			 .difference( Extrude.move(holeR,bezierToTransforms(rightSideLower,  10)))
+			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideUpper, i==(panelsPerSide-1)?3: 10)))
+			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideLower, i==(panelsPerSide-1)?6: 10)))
 	
 	//if(i==(panelsPerSide-1))
 	//	shape=shape .movex((-panelMaxWidth)- (10))
