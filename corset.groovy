@@ -5,12 +5,13 @@ double mm(double input){
 }
 double seamInset = 14
 double boningWidth =6
+
 // horizontal
 //bustSize 		= new LengthParameter("Bust Size",30,[120.0,1.0])
-underbust		= new LengthParameter("underbust",mm(28),[120.0,1.0])
-waist 		= new LengthParameter("waist",mm(20),[120.0,1.0])
+underbust		= new LengthParameter("underbust",mm(26),[120.0,1.0])
+waist 		= new LengthParameter("waist",mm(26),[120.0,1.0])
 highHip		= new LengthParameter("high hip",mm(30),[120.0,1.0])
-lowHip 		= new LengthParameter("low hip",mm(31),[120.0,1.0])
+lowHip 		= new LengthParameter("low hip",mm(38),[120.0,1.0])
 // verticals
 //upBreast 		= new LengthParameter("up breast",30,[120.0,1.0])
 //downbreast	= new LengthParameter("down breast",30,[120.0,1.0])
@@ -262,15 +263,15 @@ for(int i=0;i<panelsPerSide;i++){
 	
 	double controlOffsetRight = heightRightLower/4
 	double controlOffsetLeft  = heightLeftLower/4
-	double upperWidth = underbust.getMM()/numPanels.getMM()
-	double upperDiff = panelMaxWidth-upperWidth
+	double upperWidth = underbust.getMM()/numPanels.getMM()+seamAllowance
+	double upperDiff = (panelMaxWidth-upperWidth)/2
 
 	Vector3d upperRight = 		new Vector3d(upperDiff,heightRightUpper,0)
 	Vector3d centerRight =		new Vector3d(widthDifference,0,0)
 	Vector3d bottomRight = 		new Vector3d(0,heightRightLower,0)
 	Vector3d bottomLeft  = 		new Vector3d(panelMaxWidth,heightLeftLower,0)
 	Vector3d centerLeft = 		new Vector3d(panelMaxWidth-widthDifference,0,0)
-	Vector3d upperleft = 		new Vector3d(upperWidth,heightLeftUpper,0)
+	Vector3d upperleft = 		new Vector3d(panelMaxWidth-upperDiff,heightLeftUpper,0)
 	
 	List<Vector3d> rightSideLower=[	centerRight,
 							new Vector3d(widthDifference,controlOffsetRight,0),
@@ -290,7 +291,7 @@ for(int i=0;i<panelsPerSide;i++){
 							centerRight]
 	List<Vector3d> leftSideUpper =[centerLeft,
 							new Vector3d(panelMaxWidth-widthDifference,-controlOffsetLeft,0),
-							new Vector3d(upperWidth,heightLeftUpper+controlOffsetLeft,0),
+							new Vector3d(panelMaxWidth-upperDiff,heightLeftUpper+controlOffsetLeft,0),
 							upperleft]
 	List<Vector3d> top =[	upperleft,
 							new Vector3d(panelMaxWidth-widthDifference,heightLeftUpper,0),
@@ -328,6 +329,7 @@ for(int i=0;i<panelsPerSide;i++){
 	]
 	//println profile
 	CSG shape = byPath(profile,5)
+	//CSG shape = new Cube(2,2,30).toCSG()
 	CSG hole = new Cube(2,2,30).toCSG()
 	hole = hole.toYMax().toXMax()
 			.movey(-seamInset/2-boningWidth/2)
@@ -347,15 +349,15 @@ for(int i=0;i<panelsPerSide;i++){
 					.movez(-15)
 	}
 	if(i==(panelsPerSide-1)){
-		holeL =  holeR.movex(mm(-0.5)).union(holeR.movex(mm(-1)))
+		holeL =  hole.movex(mm(-0.5)).union(hole.movex(mm(-1)))
 					
 	}
-	
+	int holesPerSide = 7
 	//holeParts.remove(holeParts.size()-1)
-	def llower  =bezierToTransforms(leftSideLower, i==(panelsPerSide-1)?5: 7)
-	def rlower  =bezierToTransforms(rightSideLower,  7)
-	def rUpper = bezierToTransforms(rightSideUpper,  7)
-	def lUpper  =bezierToTransforms(leftSideUpper, i==(panelsPerSide-1)?4: 7)
+	def llower  =bezierToTransforms(leftSideLower, i==(panelsPerSide-1)?5: holesPerSide)
+	def rlower  =bezierToTransforms(rightSideLower,  holesPerSide)
+	def rUpper = bezierToTransforms(rightSideUpper,  holesPerSide)
+	def lUpper  =bezierToTransforms(leftSideUpper, i==(panelsPerSide-1)?4: holesPerSide)
 	rlower.remove(0)
 	lUpper.remove(0)
 	shape=shape.difference( Extrude.move(holeR,rUpper))
