@@ -55,10 +55,12 @@ public static CSG byPath(List<List<Vector3d>> points, double height, int resolut
 		Vector3d finalPoint = new Vector3d(t1.x , t1.y , 0);
 		finalPath.add(finalPoint);
 	}
-	//showEdges(finalPath,(double)0.0,javafx.scene.paint.Color.RED)
+	showEdges(finalPath,(double)0.0,javafx.scene.paint.Color.RED)
+	println "Path size = " +finalPath.size()
 	//List<Polygon> p =  Polygon.fromConcavePoints(finalPath)
 	//for(Polygon pl:p)
 	//	BowlerStudioController.getBowlerStudio()addObject(pl,null)
+	//return new Cube(height).toCSG()
 	return Extrude.points(new Vector3d(0, 0, height), finalPath);
 }
 public static ArrayList<Transform> pathToTransforms(List<List<Vector3d>> points, int resolution){
@@ -107,7 +109,7 @@ public static ArrayList<Transform> pathToTransforms(List<List<Vector3d>> points,
 	BezierPath path2 = new BezierPath();
 	path2.parsePathString(pathStringB);
 	
-	return Extrude.bezierToTransforms(path, path2, resolution)
+	return bezierToTransforms(path, path2, resolution)
 }
 
 public static ArrayList<CSG> moveAlongProfile(CSG object, List<List<Vector3d>> points, int resolution){
@@ -136,72 +138,72 @@ public static ArrayList<Transform> bezierToTransforms(List<Vector3d> parts, int 
 	return bezierToTransforms(parts.get(0), parts.get(1), parts.get(2),parts.get(3), iterations);
 }
 public static ArrayList<Transform> bezierToTransforms(BezierPath pathA, BezierPath pathB, int iterations) {
-	ArrayList<Transform> p = new ArrayList<Transform>();
-	Vector3d pointAStart = pathA.eval(0);
-	Vector3d pointBStart = pathB.eval(0);
-	double x = pointAStart.x, y = pointAStart.y, z =  pointBStart.y;
-	double lastx = x, lasty = y, lastz = z;
-	
-	for (int i = 0; i < iterations - 1; i++) {
-		float pathFunction = (float)(i/(iterations - 1))+0.00001
-		Vector3d pointA = pathA.eval(pathFunction);
-		Vector3d pointB = pathB.eval(pathFunction);
+	    ArrayList<Transform> p = new ArrayList<Transform>();
+	    Vector3d pointAStart = pathA.eval(0);
+	    Vector3d pointBStart = pathB.eval(0);
+	    double x = pointAStart.x, y = pointAStart.y, z =  pointBStart.y;
+	    double lastx = x, lasty = y, lastz = z;
+	    
+	    for (int i = 0; i < iterations - 1; i++) {
+	        float pathFunction = (float)(((float)i)/((float)(iterations - 1)));
+	        Vector3d pointA = pathA.eval(pathFunction);
+	        Vector3d pointB = pathB.eval(pathFunction);
 
-		x = pointA.x;
-		y = pointA.y;
-		z = pointB.y;
-		
-		Transform t = new Transform();
-		t.translateX(x);
-		t.translateY(y);
-		t.translateZ(z);
+	        x = pointA.x;
+	        y = pointA.y;
+	        z = pointB.y;
+	        
+	        Transform t = new Transform();
+	        t.translateX(x);
+	        t.translateY(y);
+	        t.translateZ(z);
 
-		double ydiff = y - lasty;
-		double zdiff = z - lastz;
-		double xdiff = x - lastx;
+	        double ydiff = y - lasty;
+	        double zdiff = z - lastz;
+	        double xdiff = x - lastx;
 
-		// t.rotX(45-Math.toDegrees(Math.atan2(zdiff,ydiff)))
+	        // t.rotX(45-Math.toDegrees(Math.atan2(zdiff,ydiff)))
 
-		double rise = zdiff;
-		double run = Math.sqrt((ydiff * ydiff) + (xdiff * xdiff));
-		double rotz = 90 - Math.toDegrees(Math.atan2(xdiff, ydiff));
-		double roty = Math.toDegrees(Math.atan2(rise, run));
+	        double rise = zdiff;
+	        double run = Math.sqrt((ydiff * ydiff) + (xdiff * xdiff));
+	        double rotz = 90 - Math.toDegrees(Math.atan2(xdiff, ydiff));
+	        double roty = Math.toDegrees(Math.atan2(rise, run));
 
-		t.rotZ(-rotz);
-		t.rotY(roty);
-		if(i==0)
-			println "  Tr = "+x+" "+y+" "+z
-		// println "z = "+rotz+" y = "+roty
-		p.add(t);
-		lastx = x;
-		lasty = y;
-		lastz = z;
-	}
-	Vector3d pointA = pathA.eval((float) 0.99999);
-	Vector3d pointB = pathB.eval((float) 0.99999);
+	        t.rotZ(-rotz);
+	        t.rotY(roty);
+	        //if(i==0)
+	        //    println "  Tr = "+x+" "+y+" "+z
+	        System.out.println( "  GR-Tr = "+x+" "+y+" "+z+" path = "+pathFunction);
+	        p.add(t);
+	        lastx = x;
+	        lasty = y;
+	        lastz = z;
+	    }
+	    Vector3d pointA = pathA.eval((float) 1);
+	    Vector3d pointB = pathB.eval((float) 1);
 
-	x = pointA.x;
-	y = pointA.y;
-	z = pointB.y;
-	Transform t = new Transform();
-	t.translateX(x);
-	t.translateY(y);
-	t.translateZ(z);
+	    x = pointA.x;
+	    y = pointA.y;
+	    z = pointB.y;
+	    Transform t = new Transform();
+	    t.translateX(x);
+	    t.translateY(y);
+	    t.translateZ(z);
 
-	double ydiff = y - lasty;
-	double zdiff = z - lastz;
-	double xdiff = x - lastx;
+	    double ydiff = y - lasty;
+	    double zdiff = z - lastz;
+	    double xdiff = x - lastx;
 
-	double rise = zdiff;
-	double run = Math.sqrt((ydiff * ydiff) + (xdiff * xdiff));
-	double rotz = 90 - Math.toDegrees(Math.atan2(xdiff, ydiff));
-	double roty = Math.toDegrees(Math.atan2(rise, run));
+	    double rise = zdiff;
+	    double run = Math.sqrt((ydiff * ydiff) + (xdiff * xdiff));
+	    double rotz = 90 - Math.toDegrees(Math.atan2(xdiff, ydiff));
+	    double roty = Math.toDegrees(Math.atan2(rise, run));
 
-	t.rotZ(-rotz);
-	t.rotY(roty);
-	p.add(t);
+	    t.rotZ(-rotz);
+	    t.rotY(roty);
+	    p.add(t);
 
-	return p;
+	    return p;
 }
 public static ArrayList<Transform> bezierToTransforms(Vector3d start, Vector3d controlA, Vector3d controlB,
 		Vector3d endPoint, int iterations) {
@@ -216,7 +218,7 @@ public static ArrayList<Transform> bezierToTransforms(Vector3d start, Vector3d c
 			"C " + controlA.x + "," + controlA.z + " " + controlB.x + "," + controlB.z + " "
 			+ endPoint.x + "," + endPoint.z);
 
-	def parts =  bezierToTransforms(path, path2, iterations);
+	def parts =  Extrude.bezierToTransforms(path, path2, iterations);
 	def newParts =[]
 	for(int i=0;iterations!=newParts.size();i++){
 		newParts.add(parts.get(i))
@@ -328,12 +330,12 @@ for(int i=0;i<panelsPerSide;i++){
 			rightSideUpper
 	]
 	//println profile
-	CSG shape = byPath(profile,5)
+	CSG shape = Extrude.byPath(profile,5)
 	//CSG shape = new Cube(2,2,30).toCSG()
 	CSG hole = new Cube(2,2,30).toCSG()
-	hole = hole.toYMax().toXMax()
+	hole = hole.toYMax()//.toXMax()
 			.movey(-seamInset/2-boningWidth/2)
-			.union(hole.toYMin().toXMin()
+			.union(hole.toYMin()//.toXMin()
 			.movey((-seamInset/2)+boningWidth/2)
 			)
 					
@@ -353,24 +355,53 @@ for(int i=0;i<panelsPerSide;i++){
 					
 	}
 	int holesPerSide = 7
-	//holeParts.remove(holeParts.size()-1)
-	def llower  =bezierToTransforms(leftSideLower, i==(panelsPerSide-1)?5: holesPerSide)
-	def rlower  =bezierToTransforms(rightSideLower,  holesPerSide)
-	def rUpper = bezierToTransforms(rightSideUpper,  holesPerSide)
-	def lUpper  =bezierToTransforms(leftSideUpper, i==(panelsPerSide-1)?4: holesPerSide)
+	double spacing = (i*panelMaxWidth)+ (10*i)
+	println "Loading from lib"
+	def llower  =Extrude.bezierToTransforms((List<Vector3d> )leftSideLower, i==(panelsPerSide-1)?5: holesPerSide)
+	def rlower  =Extrude.bezierToTransforms((List<Vector3d> )rightSideLower,  holesPerSide)
+	def rUpper = Extrude.bezierToTransforms((List<Vector3d> )rightSideUpper,  holesPerSide)
+	def lUpper  =Extrude.bezierToTransforms((List<Vector3d> )leftSideUpper, i==(panelsPerSide-1)?4: holesPerSide)
 	rlower.remove(0)
 	lUpper.remove(0)
-	shape=shape.difference( Extrude.move(holeR,rUpper))
-			 .difference( Extrude.move(holeR,rlower))
-			 .difference( Extrude.move(holeL,lUpper))
-			 .difference( Extrude.move(holeL,llower))
+	llower.remove(0)
+	//rUpper.remove(0)
+	def llHole = Extrude.move(holeL,llower).collect{ 
+		def moved = it.movex(spacing)
+		moved.addExportFormat("svg")
+		return moved
+	}
+	def lrHole = Extrude.move(holeR,rlower).collect{ 
+		def moved = it.movex(spacing)
+		moved.addExportFormat("svg")
+		return moved
+	}
+	def ulHole = Extrude.move(holeL,lUpper).collect{ 
+		def moved = it.movex(spacing)
+		moved.addExportFormat("svg")
+		return moved
+	}
+	def urHole = Extrude.move(holeR,rUpper).collect{ 
+		def moved = it.movex(spacing)
+		moved.addExportFormat("svg")
+		return moved
+	}
+
+	shape=shape.movex(spacing)
+	shape=shape.difference( urHole)
+			 .difference( ulHole)
+			 .difference( lrHole)
+			 .difference( llHole)
 	
 	//if(i==(panelsPerSide-1))
 	//	shape=shape .movex((-panelMaxWidth)- (10))
 	//else
-		shape=shape.movex((i*panelMaxWidth)+ (10*i))
+		
 	shape.addExportFormat("svg")
 	panels.add(shape)
+	panels.addAll(llHole)
+	panels.addAll(lrHole)
+	panels.addAll(ulHole)
+	panels.addAll(urHole)
 	if(i==0){
 		
 		//Image ruler = AssetFactory.loadAsset("BowlerStudio-Icon.png");
