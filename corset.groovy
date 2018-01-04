@@ -346,8 +346,8 @@ for(int i=0;i<panelsPerSide;i++){
 				.movex(mm(-0.3))
 					
 	if(i==0){
-		holeR =  new Cylinder(2,30,(int)10).toCSG()
-					.movey(-5)					
+		holeR =  new Cylinder(4,30,(int)10).toCSG()
+					.movey(-7)					
 					.movez(-15)
 	}
 	if(i==(panelsPerSide-1)){
@@ -365,43 +365,28 @@ for(int i=0;i<panelsPerSide;i++){
 	lUpper.remove(0)
 	llower.remove(0)
 	//rUpper.remove(0)
-	def llHole = Extrude.move(holeL,llower).collect{ 
-		def moved = it.movex(spacing)
-		moved.addExportFormat("svg")
-		return moved
-	}
-	def lrHole = Extrude.move(holeR,rlower).collect{ 
-		def moved = it.movex(spacing)
-		moved.addExportFormat("svg")
-		return moved
-	}
-	def ulHole = Extrude.move(holeL,lUpper).collect{ 
-		def moved = it.movex(spacing)
-		moved.addExportFormat("svg")
-		return moved
-	}
-	def urHole = Extrude.move(holeR,rUpper).collect{ 
-		def moved = it.movex(spacing)
-		moved.addExportFormat("svg")
-		return moved
-	}
+	def llHole = Extrude.move(holeL,llower).collect{it.movex(spacing)}
+	def lrHole = Extrude.move(holeR,rlower).collect{it.movex(spacing)}
+	def ulHole = Extrude.move(holeL,lUpper).collect{it.movex(spacing)}
+	def urHole = Extrude.move(holeR,rUpper).collect{it.movex(spacing)}
 
 	shape=shape.movex(spacing)
-	shape=shape.difference( urHole)
+	CSG ShapeWithHoles=shape.difference( urHole)
 			 .difference( ulHole)
 			 .difference( lrHole)
 			 .difference( llHole)
+			 
 	
 	//if(i==(panelsPerSide-1))
 	//	shape=shape .movex((-panelMaxWidth)- (10))
 	//else
-		
+	ShapeWithHoles.addExportFormat("svg")
+	ShapeWithHoles.setName(i+" panel withHoles")	
+	shape=shape.movez(-2.5)
 	shape.addExportFormat("svg")
-	panels.add(shape)
-	panels.addAll(llHole)
-	panels.addAll(lrHole)
-	panels.addAll(ulHole)
-	panels.addAll(urHole)
+	shape.setName(i+" panel")
+	panels.addAll([shape,ShapeWithHoles])
+	
 	if(i==0){
 		
 		//Image ruler = AssetFactory.loadAsset("BowlerStudio-Icon.png");
