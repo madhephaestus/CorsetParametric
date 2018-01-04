@@ -3,7 +3,8 @@ CSGDatabase.clear()
 double mm(double input){
 	return input*25.4
 }
-double seamInset = 6
+double seamInset = 14
+double boningWidth =6
 // horizontal
 //bustSize 		= new LengthParameter("Bust Size",30,[120.0,1.0])
 underbust		= new LengthParameter("underbust",mm(28),[120.0,1.0])
@@ -230,7 +231,7 @@ int panelsPerSide = numPanels.getMM()/2
 
 
 for(int i=0;i<panelsPerSide;i++){
-	double seamAllowance = (seamInset*(panelsPerSide-1))/panelsPerSide
+	double seamAllowance = ((seamInset+boningWidth)*(panelsPerSide-1))/panelsPerSide
 	double panelMaxWidth = lowHip.getMM()/numPanels.getMM()+seamAllowance
 	double waistSecion = waist.getMM()/numPanels.getMM()+seamAllowance
 	double widthDifference = (panelMaxWidth-waistSecion)/2
@@ -327,13 +328,18 @@ for(int i=0;i<panelsPerSide;i++){
 	]
 	//println profile
 	CSG shape = byPath(profile,5)
-	CSG holeR =  new Cube(2,2,30).toCSG()
-					.movey(-seamInset/2)
-					.movex(mm(0.3))
+	CSG hole = new Cube(2,2,30).toCSG()
+	hole = hole.toYMax().toXMax()
+			.movey(-seamInset/2-boningWidth/2)
+			.union(hole.toYMin().toXMin()
+			.movey((-seamInset/2)+boningWidth/2)
+			)
 					
-	CSG holeL =  new Cube(2,2,30).toCSG()
-					.movey(-seamInset/2)
-					.movex(mm(-0.3))
+	CSG holeR =  hole
+				.movex(mm(0.3))
+					
+	CSG holeL =  hole
+				.movex(mm(-0.3))
 					
 	if(i==0){
 		holeR =  new Cylinder(2,30,(int)10).toCSG()
@@ -346,11 +352,16 @@ for(int i=0;i<panelsPerSide;i++){
 	}
 	
 	//holeParts.remove(holeParts.size()-1)
-	
-	shape=shape.difference( Extrude.move(holeR,bezierToTransforms(rightSideUpper,  7)))
-			 .difference( Extrude.move(holeR,bezierToTransforms(rightSideLower,  7)))
-			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideUpper, i==(panelsPerSide-1)?4: 7)))
-			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideLower, i==(panelsPerSide-1)?5: 7)))
+	def llower  =bezierToTransforms(leftSideLower, i==(panelsPerSide-1)?5: 7)
+	def rlower  =bezierToTransforms(rightSideLower,  7)
+	def rUpper = bezierToTransforms(rightSideUpper,  7)
+	def lUpper  =bezierToTransforms(leftSideUpper, i==(panelsPerSide-1)?4: 7)
+	rlower.remove(0)
+	lUpper.remove(0)
+	shape=shape.difference( Extrude.move(holeR,rUpper))
+			 .difference( Extrude.move(holeR,rlower))
+			 .difference( Extrude.move(holeL,lUpper))
+			 .difference( Extrude.move(holeL,llower))
 	
 	//if(i==(panelsPerSide-1))
 	//	shape=shape .movex((-panelMaxWidth)- (10))
