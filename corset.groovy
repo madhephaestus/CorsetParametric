@@ -21,7 +21,7 @@ waistHighHip	= new LengthParameter("waist high hip",mm(4),[120.0,1.0])
 waistBackTop	= new LengthParameter("waist to top back",mm(8),[120.0,1.0])
 waistBackBottom= new LengthParameter("waist to bottom back",mm(9.5),[120.0,1.0])
 // construction
-numPanels	= new LengthParameter("number of panels",4,[12,4])
+numPanels	= new LengthParameter("number of panels",8,[12,4])
 static ArrayList<Line3D> showEdges(ArrayList<Vector3d> finalPath,Double offset, javafx.scene.paint.Color color ){
 	 ArrayList<Line3D> lines =[]
 	for(int i=0;i<finalPath.size();i++){
@@ -53,7 +53,7 @@ public static CSG byPath(List<List<Vector3d>> points, double height, int resolut
 		Vector3d finalPoint = new Vector3d(t1.x , t1.y , 0);
 		finalPath.add(finalPoint);
 	}
-	showEdges(finalPath,(double)0.0,javafx.scene.paint.Color.RED)
+	//showEdges(finalPath,(double)0.0,javafx.scene.paint.Color.RED)
 	//List<Polygon> p =  Polygon.fromConcavePoints(finalPath)
 	//for(Polygon pl:p)
 	//	BowlerStudioController.getBowlerStudio()addObject(pl,null)
@@ -259,8 +259,8 @@ for(int i=0;i<panelsPerSide;i++){
 	double heightRightLower = MaxHeightLower-(heightDifferenceLower*incrementA)
 	double heightLeftLower = MaxHeightLower-(heightDifferenceLower*incrementB)
 	
-	double controlOffsetRight = MaxHeightLower/4
-	double controlOffsetLeft  = MaxHeightLower/4
+	double controlOffsetRight = heightRightLower/4
+	double controlOffsetLeft  = heightLeftLower/4
 	double upperWidth = underbust.getMM()/numPanels.getMM()
 	double upperDiff = panelMaxWidth-upperWidth
 
@@ -270,22 +270,23 @@ for(int i=0;i<panelsPerSide;i++){
 	Vector3d bottomLeft  = 		new Vector3d(panelMaxWidth,heightLeftLower,0)
 	Vector3d centerLeft = 		new Vector3d(panelMaxWidth-widthDifference,0,0)
 	Vector3d upperleft = 		new Vector3d(upperWidth,heightLeftUpper,0)
-	List<Vector3d> rightSideUpper=[	upperRight,
-							new Vector3d(upperDiff,heightRightUpper+controlOffsetRight,0),
-							new Vector3d(widthDifference,-controlOffsetRight ,0),
-							centerRight]
+	
 	List<Vector3d> rightSideLower=[	centerRight,
 							new Vector3d(widthDifference,controlOffsetRight,0),
 							new Vector3d(0,heightRightLower-controlOffsetRight ,0),
 							bottomRight]
-	List<Vector3d> bottom =[ bottomRight,
-							new Vector3d(widthDifference,heightRightLower,0),
-							new Vector3d(panelMaxWidth-widthDifference,heightLeftLower,0),
-							bottomLeft]
 	List<Vector3d> leftSideLower =[bottomLeft,
 							new Vector3d(panelMaxWidth,heightLeftLower-controlOffsetLeft,0),
 							new Vector3d(panelMaxWidth-widthDifference,controlOffsetLeft,0),
 							centerLeft]
+	List<Vector3d> bottom =[ bottomRight,
+							new Vector3d(widthDifference,heightRightLower,0),
+							new Vector3d(panelMaxWidth-widthDifference,heightLeftLower,0),
+							bottomLeft]
+	List<Vector3d> rightSideUpper=[	upperRight,
+							new Vector3d(upperDiff,heightRightUpper+controlOffsetRight,0),
+							new Vector3d(widthDifference,-controlOffsetRight ,0),
+							centerRight]
 	List<Vector3d> leftSideUpper =[centerLeft,
 							new Vector3d(panelMaxWidth-widthDifference,-controlOffsetLeft,0),
 							new Vector3d(upperWidth,heightLeftUpper+controlOffsetLeft,0),
@@ -328,11 +329,11 @@ for(int i=0;i<panelsPerSide;i++){
 	CSG shape = byPath(profile,5)
 	CSG holeR =  new Cube(2,2,30).toCSG()
 					.movey(-seamInset/2)
-					.movex(mm(0.2))
+					//.movex(mm(0.2))
 					
 	CSG holeL =  new Cube(2,2,30).toCSG()
 					.movey(-seamInset/2)
-					.movex(mm(-0.2))
+					//.movex(mm(-0.2))
 					
 	if(i==0){
 		holeR =  new Cylinder(2,30,(int)10).toCSG()
@@ -348,8 +349,8 @@ for(int i=0;i<panelsPerSide;i++){
 	
 	shape=shape.difference( Extrude.move(holeR,bezierToTransforms(rightSideUpper,  10)))
 			 .difference( Extrude.move(holeR,bezierToTransforms(rightSideLower,  10)))
-			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideUpper, i==(panelsPerSide-1)?3: 10)))
-			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideLower, i==(panelsPerSide-1)?6: 10)))
+			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideUpper, i==(panelsPerSide-1)?4: 10)))
+			 .difference( Extrude.move(holeL,bezierToTransforms(leftSideLower, i==(panelsPerSide-1)?5: 10)))
 	
 	//if(i==(panelsPerSide-1))
 	//	shape=shape .movex((-panelMaxWidth)- (10))
@@ -357,7 +358,11 @@ for(int i=0;i<panelsPerSide;i++){
 		shape=shape.movex((i*panelMaxWidth)+ (10*i))
 	shape.addExportFormat("svg")
 	panels.add(shape)
+	if(i==0){
+		
+		//Image ruler = AssetFactory.loadAsset("BowlerStudio-Icon.png");
+		//ImageView rulerImage = new ImageView(ruler);
+		//Slice.slice(shape,slicePlane, 0)
+	}
 }
-
-
 return panels
