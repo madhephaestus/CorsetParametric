@@ -3,12 +3,13 @@ CSGDatabase.clear()
 double mm(double input){
 	return input*25.4
 }
-double seamInset = 14
-double boningWidth =6
+double boningWidth =8
+double seamInset = boningWidth*2+2
+
 
 // horizontal
 //bustSize 		= new LengthParameter("Bust Size",30,[120.0,1.0])
-underbust		= new LengthParameter("underbust",mm(26),[120.0,1.0])
+underbust		= new LengthParameter("underbust",mm(32),[120.0,1.0])
 waist 		= new LengthParameter("waist",mm(26),[120.0,1.0])
 highHip		= new LengthParameter("high hip",mm(30),[120.0,1.0])
 lowHip 		= new LengthParameter("low hip",mm(38),[120.0,1.0])
@@ -254,7 +255,7 @@ for(int i=0;i<panelsPerSide;i++){
 		 
 	}
 	
-	println "Increment A = "+incrementA+" increment b "+incrementB
+	//println "Increment A = "+incrementA+" increment b "+incrementB
 	double heightDifferenceUpper =MaxHeightUpper- MinHeightUpper
 	double heightDifferenceLower =MaxHeightLower- MinHeightLower
 	
@@ -356,7 +357,7 @@ for(int i=0;i<panelsPerSide;i++){
 	}
 	int holesPerSide = 7
 	double spacing = (i*panelMaxWidth)+ (10*i)
-	println "Loading from lib"
+	//println "Loading from lib"
 	def llower  =Extrude.bezierToTransforms((List<Vector3d> )leftSideLower, i==(panelsPerSide-1)?5: holesPerSide)
 	def rlower  =Extrude.bezierToTransforms((List<Vector3d> )rightSideLower,  holesPerSide)
 	def rUpper = Extrude.bezierToTransforms((List<Vector3d> )rightSideUpper,  holesPerSide)
