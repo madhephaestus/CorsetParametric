@@ -9,20 +9,20 @@ double seamInset = boningWidth*2+2
 
 // horizontal
 //bustSize 		= new LengthParameter("Bust Size",30,[120.0,1.0])
-underbust		= new LengthParameter("underbust",mm(32),[120.0,1.0])
-waist 		= new LengthParameter("waist",mm(26),[120.0,1.0])
-highHip		= new LengthParameter("high hip",mm(30),[120.0,1.0])
-lowHip 		= new LengthParameter("low hip",mm(38),[120.0,1.0])
+underbust		= new LengthParameter("underbust",mm(34)/Math.PI,[120.0,1.0])
+waist 		= new LengthParameter("waist",mm(30)/Math.PI,[120.0,1.0])
+highHip		= new LengthParameter("high hip",mm(39)/Math.PI,[120.0,1.0])
+lowHip 		= new LengthParameter("low hip",mm(41)/Math.PI,[120.0,1.0])
 // verticals
 //upBreast 		= new LengthParameter("up breast",30,[120.0,1.0])
 //downbreast	= new LengthParameter("down breast",30,[120.0,1.0])
 //midBreast		= new LengthParameter("middle of breast",30,[120.0,1.0])
-uBreastToWaist	= new LengthParameter("under breast to waist",mm(5.5),[120.0,1.0])
-waistToPubic 	= new LengthParameter("waist to pubic bone",mm(7.5),[120.0,1.0])
+uBreastToWaist	= new LengthParameter("under breast to waist",mm(4),[120.0,1.0])
+waistToPubic 	= new LengthParameter("waist to pubic bone",mm(8),[120.0,1.0])
 waistHighHip	= new LengthParameter("waist high hip",mm(4),[120.0,1.0])
 //waistLowHip	= new LengthParameter("waist low hip",30,[120.0,1.0])
-waistBackTop	= new LengthParameter("waist to top back",mm(8),[120.0,1.0])
-waistBackBottom= new LengthParameter("waist to bottom back",mm(9.5),[120.0,1.0])
+waistBackTop	= new LengthParameter("waist to top back",mm(7),[120.0,1.0])
+waistBackBottom= new LengthParameter("waist to bottom back",mm(6.75),[120.0,1.0])
 // construction
 numPanels	= new LengthParameter("number of panels",8,[12,4])
 static ArrayList<Line3D> showEdges(ArrayList<Vector3d> finalPath,Double offset, javafx.scene.paint.Color color ){
