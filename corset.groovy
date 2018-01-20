@@ -8,17 +8,18 @@ double seamInset = boningWidth*2+2
 
 
 // horizontal
+
 //bustSize 		= new LengthParameter("Bust Size",30,[120.0,1.0])
-underbust		= new LengthParameter("underbust",mm(34)/Math.PI,[120.0,1.0])
-waist 		= new LengthParameter("waist",mm(30)/Math.PI,[120.0,1.0])
-highHip		= new LengthParameter("high hip",mm(39)/Math.PI,[120.0,1.0])
-lowHip 		= new LengthParameter("low hip",mm(41)/Math.PI,[120.0,1.0])
+underbust		= new LengthParameter("underbust",mm(34),[120.0,1.0])
+waist 		= new LengthParameter("waist",mm(30),[120.0,1.0])
+highHip		= new LengthParameter("high hip",mm(39),[120.0,1.0])
+lowHip 		= new LengthParameter("low hip",mm(41),[120.0,1.0])
 // verticals
 //upBreast 		= new LengthParameter("up breast",30,[120.0,1.0])
 //downbreast	= new LengthParameter("down breast",30,[120.0,1.0])
 //midBreast		= new LengthParameter("middle of breast",30,[120.0,1.0])
 uBreastToWaist	= new LengthParameter("under breast to waist",mm(4),[120.0,1.0])
-waistToPubic 	= new LengthParameter("waist to pubic bone",mm(8),[120.0,1.0])
+waistToPubic 	= new LengthParameter("waist to pubic bone",mm(6),[120.0,1.0])
 waistHighHip	= new LengthParameter("waist high hip",mm(4),[120.0,1.0])
 //waistLowHip	= new LengthParameter("waist low hip",30,[120.0,1.0])
 waistBackTop	= new LengthParameter("waist to top back",mm(7),[120.0,1.0])
@@ -333,7 +334,7 @@ for(int i=0;i<panelsPerSide;i++){
 	//println profile
 	CSG shape = Extrude.byPath(profile,5)
 	//CSG shape = new Cube(2,2,30).toCSG()
-	CSG hole = new Cube(2,2,30).toCSG()
+	CSG hole = new Cube(3.18,3.18,30).toCSG()
 	hole = hole.toYMax()//.toXMax()
 			.movey(-seamInset/2-boningWidth/2)
 			.union(hole.toYMin()//.toXMin()
@@ -347,16 +348,17 @@ for(int i=0;i<panelsPerSide;i++){
 				.movex(mm(-0.3))
 					
 	if(i==0){
-		holeR =  new Cylinder(4,30,(int)10).toCSG()
+		holeR =  new Cylinder(7.14/2,30,(int)10).toCSG()
 					.movey(-7)					
 					.movez(-15)
 	}
+	double centerDistanceOfLatch = mm(1.0+1.0/8.0)
 	if(i==(panelsPerSide-1)){
-		holeL =  hole.movex(mm(-0.5)).union(hole.movex(mm(-1)))
+		holeL =  hole.movex(mm(-0.25)).union(hole.movex(mm(-centerDistanceOfLatch-0.25)))
 					
 	}
 	int holesPerSide = 7
-	double spacing = (i*panelMaxWidth)+ (10*i)
+	double spacing = (i*panelMaxWidth)//+ (10*i)
 	//println "Loading from lib"
 	def llower  =Extrude.bezierToTransforms((List<Vector3d> )leftSideLower, i==(panelsPerSide-1)?5: holesPerSide)
 	def rlower  =Extrude.bezierToTransforms((List<Vector3d> )rightSideLower,  holesPerSide)
@@ -388,11 +390,13 @@ for(int i=0;i<panelsPerSide;i++){
 	shape.setName(i+" panel")
 	panels.addAll([shape,ShapeWithHoles])
 	
-	if(i==0){
+	//if(i==0){
 		
 		//Image ruler = AssetFactory.loadAsset("BowlerStudio-Icon.png");
 		//ImageView rulerImage = new ImageView(ruler);
 		//Slice.slice(shape,slicePlane, 0)
-	}
+		println "Panel width "+ ((shape.getTotalX()-seamInset)/25.4)*panelsPerSide*2
+		
+	//}
 }
 return panels
