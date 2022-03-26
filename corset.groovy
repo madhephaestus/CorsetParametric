@@ -26,8 +26,8 @@ ArrayList<CSG> make(){
 	//upBreast 		= new LengthParameter("up breast",30,[120.0,1.0])
 	//downbreast	= new LengthParameter("down breast",30,[120.0,1.0])
 	//midBreast		= new LengthParameter("middle of breast",30,[120.0,1.0])
-	LengthParameter uBreastToWaist	= new LengthParameter("under breast to waist",mm(4),[120.0, 1.0])
-	LengthParameter waistToPubic 	= new LengthParameter("waist to pubic bone",mm(6),[120.0, 1.0])
+	LengthParameter uBreastToWaist	= new LengthParameter("under breast to waist",110,[120.0, 1.0])
+	LengthParameter waistToPubic 	= new LengthParameter("waist to pubic bone",210,[120.0, 1.0])
 	LengthParameter waistHighHip	= new LengthParameter("waist high hip",mm(4),[120.0, 1.0])
 	//waistLowHip	= new LengthParameter("waist low hip",30,[120.0,1.0])
 	LengthParameter waistBackTop	= new LengthParameter("waist to top back",mm(7),[120.0, 1.0])
@@ -36,7 +36,13 @@ ArrayList<CSG> make(){
 	LengthParameter numPanels	= new LengthParameter("number of panels",8,[12, 4])
 
 	LengthParameter numRowsRivetsParam = new LengthParameter("number rows or rivets",1,[1, 2])
+	LengthParameter buskLength = new LengthParameter("Busk Length",300,[100,600])
+	LengthParameter buskLatchWidth = new LengthParameter("Busk Latch Width",13.5,[10,20])
+	LengthParameter buskLatchFromEdge = new LengthParameter("Busk Latch From Edge",15.5,[10,20])
+	LengthParameter buskLatchCenterToCenter = new LengthParameter("Busk Center To Center",52,[10,60])
+	LengthParameter buskNubinFromEdge = new LengthParameter("Busk Nubon from Edge",4.5,[1,8])
 
+	
 	ArrayList<CSG> panels=[]
 	int panelsPerSide = numPanels.getMM()/2
 
@@ -186,7 +192,7 @@ ArrayList<CSG> make(){
 			def ydiff=Math.abs(-heightRightUpper+heightRightLower)
 			def xdiff=upperDiff
 			def angle = Math.toDegrees(Math.atan2(xdiff, ydiff))
-			println "Ydiff:"+ ydiff+" xdiff="+xdiff+" angle "+angle
+			//println "Ydiff:"+ ydiff+" xdiff="+xdiff+" angle "+angle
 			
 			def laceFromEdge=14
 			def laceHole=new Cylinder(7.14/2,30,(int)10).toCSG()
@@ -206,9 +212,30 @@ ArrayList<CSG> make(){
 			shape=shape.union(fold)
 		}
 		double centerDistanceOfLatch = mm(1.0+1.0/8.0)
+		boolean isBusk=(i==(panelsPerSide-1))
 		// Busk section
-		if(i==(panelsPerSide-1)){
-			holeL =  hole.movex(mm(-0.25)).union(hole.movex(mm(-centerDistanceOfLatch-0.25)))
+		if(isBusk){
+			def buskLengthV=buskLength.getMM()
+			def buskLatchWidthV=buskLatchWidth.getMM()
+			def buskLatchFromEdgeV=buskLatchFromEdge.getMM()
+			def buskLatchCenterToCenterV=buskLatchCenterToCenter.getMM()
+			def buskNubinFromEdgeV=buskNubinFromEdge.getMM()
+			
+			def ydiff=Math.abs(-heightLeftUpper+heightLeftLower)
+			def xdiff=upperDiff
+			def foldLength=Math.sqrt(Math.pow(xdiff, 2)+Math.pow(ydiff, 2))
+			def angle = Math.toDegrees(Math.atan2(xdiff, ydiff))
+			println "Ydiff:"+ ydiff+" xdiff="+xdiff+" angle "+angle
+			
+			
+			CSG buskCore = new Cube(buskLatchWidthV,buskLengthV,1).toCSG().movez(5)
+								.toYMin()
+								.toXMax()
+								.rotz(angle)
+								.movey(heightLeftUpper)
+								.movex(panelMaxWidth-upperDiff)
+			
+			shape=shape.union(buskCore)
 
 		}
 		int holesPerSide = 7
@@ -230,9 +257,11 @@ ArrayList<CSG> make(){
 
 		CSG ShapeWithHoles=shape
 				.difference( urHole)
-				.difference( ulHole)
 				.difference( lrHole)
+		if(!isBusk)
+			ShapeWithHoles=ShapeWithHoles
 				.difference( llHole)
+				.difference( ulHole)
 		//if(i==(panelsPerSide-1))
 		//	shape=shape .movex((-panelMaxWidth)- (10))
 		//else
@@ -249,13 +278,19 @@ ArrayList<CSG> make(){
 		ShapeWithHoles.setParameter(waistBackBottom)
 		ShapeWithHoles.setParameter(numPanels	)
 		ShapeWithHoles.setParameter(numRowsRivetsParam )
+		ShapeWithHoles.setParameter(buskLength)
+		ShapeWithHoles.setParameter(buskLatchWidth)
+		ShapeWithHoles.setParameter(buskLatchFromEdge)
+		ShapeWithHoles.setParameter(buskLatchCenterToCenter)
+		ShapeWithHoles.setParameter(buskNubinFromEdge)
+		
 		int arrayIndex=i
 		ShapeWithHoles.setRegenerate({ (CSG)make().get(arrayIndex)})// add a regeneration function to the CSG being returrned to lonk a change event to a re-render
 
 		shape=shape.movez(-2.5)
 		shape.addExportFormat("svg")
 		shape.setName(i+" panel")
-		panels.addAll([ShapeWithHoles,urHole,lrHole])
+		panels.addAll([ShapeWithHoles])
 
 		//if(i==0){
 
