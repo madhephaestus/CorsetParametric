@@ -167,7 +167,8 @@ ArrayList<CSG> make(){
 		//println profile
 		CSG shape = Extrude.byPath(profile,5)
 		//CSG shape = new Cube(2,2,30).toCSG()
-		CSG hole = new Cube(3.18,3.18,30).toCSG()
+		def rivetDiam=3.18
+		CSG hole = new Cube(rivetDiam,rivetDiam,30).toCSG()
 		int NumRowsOfRivets =numRowsRivetsParam.getMM()
 
 		hole = hole.toYMax()//.toXMax()
@@ -200,7 +201,7 @@ ArrayList<CSG> make(){
 			holeR = laceHole
 					.movey(-laceFromEdge)
 			.union(hole.movey(-laceFromEdge-seamInset/2))
-			.union(hole.movey(laceFromEdge*2+seamInset))
+			.union(hole.movey(laceFromEdge*2+seamInset-rivetDiam/2))
 			.union(laceHole.movey(laceFromEdge))
 			CSG fold = new Cube(laceFromEdge*2+seamInset,ydiff,5).toCSG()
 						.toXMax()
@@ -226,16 +227,50 @@ ArrayList<CSG> make(){
 			def foldLength=Math.sqrt(Math.pow(xdiff, 2)+Math.pow(ydiff, 2))
 			def angle = Math.toDegrees(Math.atan2(xdiff, ydiff))
 			println "Ydiff:"+ ydiff+" xdiff="+xdiff+" angle "+angle
+			def buskCentering=(ydiff-buskLengthV)/2
 			
+			CSG buskCore = new Cube(buskLatchWidthV,buskLengthV,1).toCSG()
+			int numBuskTabs =buskLengthV/buskLatchCenterToCenterV+1
+			println "Num busk tabs: "+numBuskTabs
+			CSG tab = new Cube(1,buskLatchWidthV,7).toCSG()
+						.toZMax()
+						.movex(buskLatchWidthV/2)
+			CSG nub = new Cube(rivetDiam,rivetDiam,7).toCSG()
+						.toZMax()
+						.movex(buskLatchWidthV/2 - buskNubinFromEdgeV)
+			for(double j=0;j<numBuskTabs;j+=1) {
+				double loc = buskLatchFromEdgeV+(buskLatchCenterToCenterV*j)-buskLengthV/2
+				buskCore=buskCore.union(tab.movey(loc))
+				buskCore=buskCore.union(nub.movey(loc))
+			}
+								
 			
-			CSG buskCore = new Cube(buskLatchWidthV,buskLengthV,1).toCSG().movez(5)
-								.toYMin()
-								.toXMax()
-								.rotz(angle)
-								.movey(heightLeftUpper)
-								.movex(panelMaxWidth-upperDiff)
+			buskCore=buskCore
+						.movez(6)
+						.toYMin()
+						.toXMax()
+						.movey(buskCentering)
+						.rotz(angle)
+						.movey(heightLeftUpper)
+						.movex(panelMaxWidth-upperDiff)
 			
-			shape=shape.union(buskCore)
+			shape=shape.difference(buskCore)
+			def locationOfFoldedRivets = seamInset/2+buskLatchWidthV+rivetDiam*2
+			holeL= hole
+				.movex(mm(-0.3))
+				.movey(-buskLatchWidthV+rivetDiam)
+			holeL=holeL.union(hole
+				.movex(mm(-0.3))
+				.movey(locationOfFoldedRivets))
+			
+			CSG fold = new Cube(locationOfFoldedRivets,ydiff,5).toCSG()
+						.toYMin()
+						.toXMin()
+						.toZMin()
+						.rotz(angle)
+						.movey(heightLeftUpper)
+						.movex(panelMaxWidth-upperDiff)
+			shape=shape.union(fold)
 
 		}
 		int holesPerSide = 7
@@ -258,7 +293,7 @@ ArrayList<CSG> make(){
 		CSG ShapeWithHoles=shape
 				.difference( urHole)
 				.difference( lrHole)
-		if(!isBusk)
+		//if(!isBusk)
 			ShapeWithHoles=ShapeWithHoles
 				.difference( llHole)
 				.difference( ulHole)
