@@ -1,4 +1,10 @@
 import com.piro.bezier.BezierPath;
+
+import eu.mihosoft.vrl.v3d.CSG
+import eu.mihosoft.vrl.v3d.Cube
+import eu.mihosoft.vrl.v3d.Cylinder
+import eu.mihosoft.vrl.v3d.Vector3d
+import eu.mihosoft.vrl.v3d.parametrics.LengthParameter
 CSGDatabase.clear()
 double mm(double input){
 	return input*25.4
