@@ -137,12 +137,12 @@ for(int i=0;i<panelsPerSide;i++){
 			.union(hole.toYMin()//.toXMin()
 			.movey((-seamInset/2)+boningWidth/2)
 			)
-					
+	int NumRowsOfRivets =1				
 	CSG holeR =  hole
-				.movex(mm(0.3))
+				.movex(NumRowsOfRivets==2?mm(0.3):0)
 					
 	CSG holeL =  hole
-				.movex(mm(-0.3))
+				.movex(NumRowsOfRivets==2?mm(-0.3):0)
 					
 	if(i==0){
 		holeR =  new Cylinder(7.14/2,30,(int)10).toCSG()
@@ -171,12 +171,12 @@ for(int i=0;i<panelsPerSide;i++){
 	def urHole = Extrude.move(holeR,rUpper).collect{it.movex(spacing)}
 
 	shape=shape.movex(spacing)
-	CSG ShapeWithHoles=shape.difference( urHole)
-			 .difference( ulHole)
-			 .difference( lrHole)
-			 .difference( llHole)
-			 
 	
+	CSG ShapeWithHoles=shape
+					.difference( urHole)
+			 		.difference( ulHole)
+			 		.difference( lrHole)
+					.difference( llHole)
 	//if(i==(panelsPerSide-1))
 	//	shape=shape .movex((-panelMaxWidth)- (10))
 	//else
@@ -185,7 +185,7 @@ for(int i=0;i<panelsPerSide;i++){
 	shape=shape.movez(-2.5)
 	shape.addExportFormat("svg")
 	shape.setName(i+" panel")
-	panels.addAll([shape,ShapeWithHoles])
+	panels.addAll([ShapeWithHoles])
 	
 	//if(i==0){
 		
