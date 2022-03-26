@@ -18,24 +18,24 @@ ArrayList<CSG> make(){
 	// horizontal
 
 	//bustSize 		= new LengthParameter("Bust Size",30,[120.0,1.0])
-	underbust		= new LengthParameter("underbust",mm(34),[120.0, 1.0])
-	waist 		= new LengthParameter("waist",mm(30),[120.0, 1.0])
-	highHip		= new LengthParameter("high hip",mm(39),[120.0, 1.0])
-	lowHip 		= new LengthParameter("low hip",mm(41),[120.0, 1.0])
+	LengthParameter underbust		= new LengthParameter ("underbust",mm(34),[120.0, 1.0])
+	LengthParameter waist 		= new LengthParameter("waist",mm(30),[120.0, 1.0])
+	LengthParameter highHip		= new LengthParameter("high hip",mm(39),[120.0, 1.0])
+	LengthParameter lowHip 		= new LengthParameter("low hip",mm(41),[120.0, 1.0])
 	// verticals
 	//upBreast 		= new LengthParameter("up breast",30,[120.0,1.0])
 	//downbreast	= new LengthParameter("down breast",30,[120.0,1.0])
 	//midBreast		= new LengthParameter("middle of breast",30,[120.0,1.0])
-	uBreastToWaist	= new LengthParameter("under breast to waist",mm(4),[120.0, 1.0])
-	waistToPubic 	= new LengthParameter("waist to pubic bone",mm(6),[120.0, 1.0])
-	waistHighHip	= new LengthParameter("waist high hip",mm(4),[120.0, 1.0])
+	LengthParameter uBreastToWaist	= new LengthParameter("under breast to waist",mm(4),[120.0, 1.0])
+	LengthParameter waistToPubic 	= new LengthParameter("waist to pubic bone",mm(6),[120.0, 1.0])
+	LengthParameter waistHighHip	= new LengthParameter("waist high hip",mm(4),[120.0, 1.0])
 	//waistLowHip	= new LengthParameter("waist low hip",30,[120.0,1.0])
-	waistBackTop	= new LengthParameter("waist to top back",mm(7),[120.0, 1.0])
-	waistBackBottom= new LengthParameter("waist to bottom back",mm(6.75),[120.0, 1.0])
+	LengthParameter waistBackTop	= new LengthParameter("waist to top back",mm(7),[120.0, 1.0])
+	LengthParameter waistBackBottom= new LengthParameter("waist to bottom back",mm(6.75),[120.0, 1.0])
 	// construction
-	numPanels	= new LengthParameter("number of panels",8,[12, 4])
+	LengthParameter numPanels	= new LengthParameter("number of panels",8,[12, 4])
 
-	numRowsRivetsParam = new LengthParameter("number rows or rivets",1,[1, 2])
+	LengthParameter numRowsRivetsParam = new LengthParameter("number rows or rivets",1,[1, 2])
 
 	ArrayList<CSG> panels=[]
 	int panelsPerSide = numPanels.getMM()/2
@@ -117,7 +117,8 @@ ArrayList<CSG> make(){
 			upperleft,
 			new Vector3d(panelMaxWidth-widthDifference,heightLeftUpper,0),
 			new Vector3d(widthDifference,heightRightUpper,0),
-			upperRight]
+			upperRight
+		]
 		if(i==(panelsPerSide-1)||
 		i==numPanels.getMM()-1){
 			leftSideLower =[
@@ -156,6 +157,7 @@ ArrayList<CSG> make(){
 			top,
 			rightSideUpper
 		]
+		
 		//println profile
 		CSG shape = Extrude.byPath(profile,5)
 		//CSG shape = new Cube(2,2,30).toCSG()
@@ -178,13 +180,33 @@ ArrayList<CSG> make(){
 
 		CSG holeL =  hole
 				.movex(mm(-0.3))
-
+		
+		// Lacing interface		
 		if(i==0){
-			holeR =  new Cylinder(7.14/2,30,(int)10).toCSG()
-					.movey(-7)
-					.movez(-15)
+			def ydiff=Math.abs(-heightRightUpper+heightRightLower)
+			def xdiff=upperDiff
+			def angle = Math.toDegrees(Math.atan2(xdiff, ydiff))
+			println "Ydiff:"+ ydiff+" xdiff="+xdiff+" angle "+angle
+			
+			def laceFromEdge=14
+			def laceHole=new Cylinder(7.14/2,30,(int)10).toCSG()
+								.movez(-15)
+			holeR = laceHole
+					.movey(-laceFromEdge)
+			.union(hole.movey(-laceFromEdge-seamInset/2))
+			.union(hole.movey(laceFromEdge*2+seamInset))
+			.union(laceHole.movey(laceFromEdge))
+			CSG fold = new Cube(laceFromEdge*2+seamInset,ydiff,5).toCSG()
+						.toXMax()
+						.toYMax()
+						.toZMin()
+						.rotz(-angle)
+						.movey(heightRightLower)
+						.movex(0.2)
+			shape=shape.union(fold)
 		}
 		double centerDistanceOfLatch = mm(1.0+1.0/8.0)
+		// Busk section
 		if(i==(panelsPerSide-1)){
 			holeL =  hole.movex(mm(-0.25)).union(hole.movex(mm(-centerDistanceOfLatch-0.25)))
 
@@ -229,11 +251,11 @@ ArrayList<CSG> make(){
 		ShapeWithHoles.setParameter(numRowsRivetsParam )
 		int arrayIndex=i
 		ShapeWithHoles.setRegenerate({ (CSG)make().get(arrayIndex)})// add a regeneration function to the CSG being returrned to lonk a change event to a re-render
-		
+
 		shape=shape.movez(-2.5)
 		shape.addExportFormat("svg")
 		shape.setName(i+" panel")
-		panels.addAll([ShapeWithHoles])
+		panels.addAll([ShapeWithHoles,urHole,lrHole])
 
 		//if(i==0){
 
