@@ -6,7 +6,7 @@ import eu.mihosoft.vrl.v3d.Cylinder
 import eu.mihosoft.vrl.v3d.Extrude
 import eu.mihosoft.vrl.v3d.Vector3d
 import eu.mihosoft.vrl.v3d.parametrics.LengthParameter
-CSGDatabase.clear()
+//CSGDatabase.clear()
 double mm(double input){
 	return input*25.4
 }
