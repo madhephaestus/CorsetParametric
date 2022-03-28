@@ -213,6 +213,7 @@ ArrayList<CSG> make(){
 			shape=shape.union(fold)
 		}
 		double centerDistanceOfLatch = mm(1.0+1.0/8.0)
+		double spacing = (i*panelMaxWidth)//+ (10*i)
 		boolean isBusk=(i==(panelsPerSide-1))
 		// Busk section
 		if(isBusk){
@@ -230,6 +231,8 @@ ArrayList<CSG> make(){
 			def buskCentering=(ydiff-buskLengthV)/2
 			
 			CSG buskCore = new Cube(buskLatchWidthV,buskLengthV,1).toCSG()
+			CSG buskTabs=buskCore
+			CSG buskNubs=buskCore
 			int numBuskTabs =buskLengthV/buskLatchCenterToCenterV+1
 			println "Num busk tabs: "+numBuskTabs
 			CSG tab = new Cube(1,buskLatchWidthV,7).toCSG()
@@ -240,12 +243,15 @@ ArrayList<CSG> make(){
 						.movex(buskLatchWidthV/2 - buskNubinFromEdgeV)
 			for(double j=0;j<numBuskTabs;j+=1) {
 				double loc = buskLatchFromEdgeV+(buskLatchCenterToCenterV*j)-buskLengthV/2
-				buskCore=buskCore.union(tab.movey(loc))
-				buskCore=buskCore.union(nub.movey(loc))
+				buskTabs=buskTabs.union(tab.movey(loc))
+				buskNubs=buskNubs.union(nub.movey(loc))
 			}
 								
-			
-			buskCore=buskCore
+			def busksBits=[buskNubs,buskTabs]
+
+			//shape=shape.difference(buskCore)
+			panels.addAll(busksBits.collect{
+						def moved=((CSG)it)
 						.movez(6)
 						.toYMin()
 						.toXMax()
@@ -253,8 +259,12 @@ ArrayList<CSG> make(){
 						.rotz(angle)
 						.movey(heightLeftUpper)
 						.movex(panelMaxWidth-upperDiff)
-			
-			shape=shape.difference(buskCore)
+						.movex(spacing)
+						moved.addExportFormat("svg")
+						return moved
+			})
+						
+						
 			def locationOfFoldedRivets = seamInset/2+buskLatchWidthV+rivetDiam*2
 			holeL= hole
 				.movex(mm(-0.3))
@@ -274,7 +284,6 @@ ArrayList<CSG> make(){
 
 		}
 		int holesPerSide = 7
-		double spacing = (i*panelMaxWidth)//+ (10*i)
 		//println "Loading from lib"
 		def llower  =Extrude.bezierToTransforms((List<Vector3d> )leftSideLower, i==(panelsPerSide-1)?5: holesPerSide)
 		def rlower  =Extrude.bezierToTransforms((List<Vector3d> )rightSideLower,  holesPerSide)
