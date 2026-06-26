@@ -10,7 +10,7 @@ import eu.mihosoft.vrl.v3d.parametrics.LengthParameter
 double mm(double input){
 	return input*25.4
 }
-ArrayList<CSG> make(){
+ArrayList<CSG> make(def csgdb){
 	double boningWidth =8
 	double seamInset = boningWidth*2+2
 
@@ -18,29 +18,29 @@ ArrayList<CSG> make(){
 	// horizontal
 
 	//bustSize 		= new LengthParameter("Bust Size",30,[120.0,1.0])
-	LengthParameter underbust		= new LengthParameter ("underbust",mm(34),[120.0, 1.0])
-	LengthParameter waist 		= new LengthParameter("waist",mm(30),[120.0, 1.0])
-	LengthParameter highHip		= new LengthParameter("high hip",mm(39),[120.0, 1.0])
-	LengthParameter lowHip 		= new LengthParameter("low hip",mm(41),[120.0, 1.0])
+	LengthParameter underbust		= new LengthParameter (csgdb,"underbust",mm(34),[120.0, 1.0])
+	LengthParameter waist 		= new LengthParameter(csgdb,"waist",mm(30),[120.0, 1.0])
+	LengthParameter highHip		= new LengthParameter(csgdb,"high hip",mm(39),[120.0, 1.0])
+	LengthParameter lowHip 		= new LengthParameter(csgdb,"low hip",mm(41),[120.0, 1.0])
 	// verticals
 	//upBreast 		= new LengthParameter("up breast",30,[120.0,1.0])
 	//downbreast	= new LengthParameter("down breast",30,[120.0,1.0])
 	//midBreast		= new LengthParameter("middle of breast",30,[120.0,1.0])
-	LengthParameter uBreastToWaist	= new LengthParameter("under breast to waist",110,[120.0, 1.0])
-	LengthParameter waistToPubic 	= new LengthParameter("waist to pubic bone",210,[120.0, 1.0])
-	LengthParameter waistHighHip	= new LengthParameter("waist high hip",mm(4),[120.0, 1.0])
+	LengthParameter uBreastToWaist	= new LengthParameter(csgdb,"under breast to waist",110,[120.0, 1.0])
+	LengthParameter waistToPubic 	= new LengthParameter(csgdb,"waist to pubic bone",210,[120.0, 1.0])
+	LengthParameter waistHighHip	= new LengthParameter(csgdb,"waist high hip",mm(4),[120.0, 1.0])
 	//waistLowHip	= new LengthParameter("waist low hip",30,[120.0,1.0])
-	LengthParameter waistBackTop	= new LengthParameter("waist to top back",mm(7),[120.0, 1.0])
-	LengthParameter waistBackBottom= new LengthParameter("waist to bottom back",mm(6.75),[120.0, 1.0])
+	LengthParameter waistBackTop	= new LengthParameter(csgdb,"waist to top back",mm(7),[120.0, 1.0])
+	LengthParameter waistBackBottom= new LengthParameter(csgdb,"waist to bottom back",mm(6.75),[120.0, 1.0])
 	// construction
-	LengthParameter numPanels	= new LengthParameter("number of panels",8,[12, 4])
+	LengthParameter numPanels	= new LengthParameter(csgdb,"number of panels",8,[12, 4])
 
-	LengthParameter numRowsRivetsParam = new LengthParameter("number rows or rivets",1,[1, 2])
-	LengthParameter buskLength = new LengthParameter("Busk Length",300,[100,600])
-	LengthParameter buskLatchWidth = new LengthParameter("Busk Latch Width",13.5,[10,20])
-	LengthParameter buskLatchFromEdge = new LengthParameter("Busk Latch From Edge",15.5,[10,20])
-	LengthParameter buskLatchCenterToCenter = new LengthParameter("Busk Center To Center",52,[10,60])
-	LengthParameter buskNubinFromEdge = new LengthParameter("Busk Nubon from Edge",4.5,[1,8])
+	LengthParameter numRowsRivetsParam = new LengthParameter(csgdb,"number rows or rivets",1,[1, 2])
+	LengthParameter buskLength = new LengthParameter(csgdb,"Busk Length",300,[100,600])
+	LengthParameter buskLatchWidth = new LengthParameter(csgdb,"Busk Latch Width",13.5,[10,20])
+	LengthParameter buskLatchFromEdge = new LengthParameter(csgdb,"Busk Latch From Edge",15.5,[10,20])
+	LengthParameter buskLatchCenterToCenter = new LengthParameter(csgdb,"Busk Center To Center",52,[10,60])
+	LengthParameter buskNubinFromEdge = new LengthParameter(csgdb,"Busk Nubon from Edge",4.5,[1,8])
 
 	
 	ArrayList<CSG> panels=[]
@@ -349,4 +349,4 @@ ArrayList<CSG> make(){
 	return panels
 }
 
-return make()
+return make(csgdb)
